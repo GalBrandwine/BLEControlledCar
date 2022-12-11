@@ -1,0 +1,6 @@
+[submodule "BLERCcar/lib/--force"]
+	path = BLERCcar/lib/--force
+	url = git@github.com:GalBrandwine/SimpleBLE.git
+[submodule "BLERCcar/lib/SimpleBLE"]
+	path = BLERCcar/lib/SimpleBLE
+	url = git@github.com:GalBrandwine/SimpleBLE.git
