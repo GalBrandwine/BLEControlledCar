@@ -1,0 +1,3 @@
+[submodule "BLERCcar/lib/SimpleBLE"]
+	path = BLERCcar/lib/SimpleBLE
+	url = git@github.com:OpenBluetoothToolbox/SimpleBLE.git

@@ -24,6 +24,7 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
+const char LED_PIN = 23;
 BLEServer *pServer = NULL;
 BLECharacteristic *pTxCharacteristic;
 bool deviceConnected = false;
@@ -60,8 +61,13 @@ class MyCallbacks : public BLECharacteristicCallbacks
 
     if (rxValue.length() > 0)
     {
+      if (rxValue == "led on")
+      {
+        digitalWrite(LED_PIN, HIGH); // turn the LED on
+      }
       Serial.println("*********");
       Serial.print("Received Value: ");
+      Serial.println(rxValue.c_str());
       for (int i = 0; i < rxValue.length(); i++)
         Serial.print(rxValue[i]);
 
@@ -73,7 +79,11 @@ class MyCallbacks : public BLECharacteristicCallbacks
 
 void setup()
 {
+
   Serial.begin(115200);
+
+  // initialize digital pin LED_BUILTIN as an output.
+  pinMode(LED_PIN, OUTPUT);
 
   // Create the BLE Device
   BLEDevice::init("UART Service");
@@ -88,7 +98,7 @@ void setup()
   // Create a BLE Characteristic
   pTxCharacteristic = pService->createCharacteristic(
       CHARACTERISTIC_UUID_TX,
-      BLECharacteristic::PROPERTY_NOTIFY);
+      BLECharacteristic::PROPERTY_NOTIFY); // See NOTIFY and other properties - https://embeddedcentric.com/lesson-2-ble-profiles-services-characteristics-device-roles-and-network-topology/
 
   pTxCharacteristic->addDescriptor(new BLE2902());
 
