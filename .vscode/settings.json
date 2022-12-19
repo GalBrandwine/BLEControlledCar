@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "*.cpp": "cpp",
+        "*.hpp": "cpp",
+        "thread": "cpp",
+        "*.tcc": "cpp",
+        "mutex": "cpp",
+        "typeindex": "cpp",
+        "typeinfo": "cpp"
+    },
+    "cSpell.words": [
+        "Copercini",
+        "Evandro",
+        "Kolban"
+    ],
+    "cmake.sourceDirectory": "${workspaceFolder}/BLERCcar/lib/SimpleBLE/examples/simplebluez"
+}
