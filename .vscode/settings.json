@@ -6,9 +6,11 @@
         "*.tcc": "cpp",
         "mutex": "cpp",
         "typeindex": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "memory": "cpp"
     },
     "cSpell.words": [
+        "bluez",
         "Copercini",
         "Evandro",
         "Kolban"

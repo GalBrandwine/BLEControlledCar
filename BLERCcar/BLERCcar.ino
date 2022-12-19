@@ -29,11 +29,13 @@ BLEServer *pServer = NULL;
 BLECharacteristic *pTxCharacteristic;
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
+bool turn_led = false;
 uint8_t txValue = 0;
 
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
 
+// These UUID's are NUS (Nordic Uart Service) https://developer.nordicsemi.com/nRF_Connect_SDK/doc/1.4.0/nrf/include/bluetooth/services/nus.html#api-documentation
 #define SERVICE_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E" // UART service UUID
 #define CHARACTERISTIC_UUID_RX "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
 #define CHARACTERISTIC_UUID_TX "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -63,7 +65,7 @@ class MyCallbacks : public BLECharacteristicCallbacks
     {
       if (rxValue == "led on")
       {
-        digitalWrite(LED_PIN, HIGH); // turn the LED on
+        turn_led = true; // turn the LED on
       }
       Serial.println("*********");
       Serial.print("Received Value: ");
@@ -118,7 +120,10 @@ void setup()
 
 void loop()
 {
-
+  if (turn_led)
+  {
+    digitalWrite(LED_PIN, HIGH); // turn the LED on
+  }
   if (deviceConnected)
   {
     // Serial.println("Device connected, setting value in TX");
