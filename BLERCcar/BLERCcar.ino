@@ -52,6 +52,7 @@ class MyServerCallbacks : public BLEServerCallbacks
   {
     Serial.printf("Device %d, had disconnected\n", pServer->getConnId());
     deviceConnected = false;
+    turn_led = false;
   }
 };
 
@@ -124,6 +125,11 @@ void loop()
   {
     digitalWrite(LED_PIN, HIGH); // turn the LED on
   }
+  else
+  {
+    digitalWrite(LED_PIN, LOW); // turn the LED on
+  }
+  
   if (deviceConnected)
   {
     // Serial.println("Device connected, setting value in TX");
