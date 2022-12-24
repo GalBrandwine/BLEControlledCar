@@ -1,0 +1,57 @@
+name: PyPI Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-22.04 , windows-2022, macos-12]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: arm64
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r simplepyble/requirements.txt
+
+      - name: Build wheel
+        uses: pypa/cibuildwheel@v2.11.3
+        env:
+          CIBW_BEFORE_ALL_LINUX: "yum update -y && yum group install -y \"Development Tools\" && yum install -y dbus-devel"
+          CIBW_ARCHS_LINUX: x86_64 i686 aarch64
+          CIBW_ARCHS_MACOS: x86_64 universal2 arm64
+          CIBW_ARCHS_WINDOWS: AMD64 x86
+          CIBW_SKIP: "*musllinux_* pp*"
+        with:
+            package-dir: simplepyble
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: simpleble-wheels
+          path: wheelhouse
+
+      - name: Check Packages
+        run: twine check wheelhouse/*.whl
+
+      - name: Publish packages
+        run: twine upload --skip-existing wheelhouse/*.whl --verbose
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USER }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}

@@ -1,0 +1,9 @@
+twine
+wheel
+ninja; platform_system!='Windows'
+pytest
+pybind11
+scikit-build
+cmake>=3.21
+setuptools>=42
+cibuildwheel==2.9
