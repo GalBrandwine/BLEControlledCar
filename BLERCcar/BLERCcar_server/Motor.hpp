@@ -24,10 +24,10 @@ namespace car
 
         {
             Serial.printf("Motor constructing:\n");
-            Serial.printf("Pin1=%d ", Pin1);
-            Serial.printf("Pin2=%d ", Pin2);
-            Serial.printf("m_Enable1Pin=%d ", m_Enable1Pin);
-            Serial.printf("m_PwmChannel=%d\n", m_PwmChannel);
+            Serial.printf("Pin1=%d\n", Pin1);
+            Serial.printf("Pin2=%d\n", Pin2);
+            Serial.printf("Enable1Pin=%d\n", m_Enable1Pin);
+            Serial.printf("PwmChannel=%d\n", m_PwmChannel);
             // sets the pins as outputs:
             pinMode(Pin1, OUTPUT);
             pinMode(Pin2, OUTPUT);
@@ -38,13 +38,15 @@ namespace car
 
             // attach the channel to the GPIO to be controlled
             ledcAttachPin(m_Enable1Pin, m_PwmChannel);
+            ledcWrite(m_PwmChannel, m_Pwmduty);
         };
+
         void SetSpeed(int speed)
         {
             m_Pwmduty = speedPercentageToDutyCycle(speed);
             Serial.println(__PRETTY_FUNCTION__);
-            Serial.printf("Input speed [%d]% ", speed);
-            Serial.printf("Setting  [%d]pwmduty\n", m_Pwmduty);
+            Serial.printf("Input speed [%d]%%\n", speed);
+            Serial.printf("Setting [%d] pwmduty\n", m_Pwmduty);
             ledcWrite(m_PwmChannel, m_Pwmduty);
         }
 

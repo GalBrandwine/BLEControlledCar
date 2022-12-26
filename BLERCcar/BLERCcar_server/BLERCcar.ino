@@ -27,14 +27,14 @@ class MyServerCallbacks : public BLEServerCallbacks
   {
     Serial.printf("Device %d, had connected\n", pServer->getConnId());
     deviceConnected = true;
-    client_connected = true; // turn the LED on
+    // client_connected = true; // turn the LED on
   };
 
   void onDisconnect(BLEServer *pServer)
   {
     Serial.printf("Device %d, had disconnected\n", pServer->getConnId());
     deviceConnected = false;
-    client_connected = false;
+    // client_connected = false;
   }
 };
 
@@ -46,10 +46,6 @@ class MyCallbacks : public BLECharacteristicCallbacks
 
     if (rxValue.length() > 0)
     {
-      if (rxValue == "led on")
-      {
-        client_connected = true; // turn the LED on
-      }
       Serial.println("*********");
       Serial.print("Received Value: ");
       Serial.println(rxValue.c_str());
@@ -103,20 +99,61 @@ void setup()
   Serial.println("Waiting a client connection to notify...");
 }
 
+bool play_once = true;
 void loop()
 {
-  if (client_connected)
-  {
-    digitalWrite(LED_PIN, HIGH); // turn the LED on
-    my_car->SetDriveMode(car::DriveMode::Forward);
-  }
-  else
-  {
-    digitalWrite(LED_PIN, LOW); // turn the LED on
-  }
 
   if (deviceConnected)
   {
+    if (play_once)
+    {
+      play_once = false;
+      digitalWrite(LED_PIN, HIGH); // turn the LED on
+      my_car->SetDriveMode(car::DriveMode::Forward);
+      delay(2000);
+      my_car->SetSpeed(80);
+      delay(2000);
+      my_car->SetSpeed(100);
+      delay(2000);
+      my_car->SetSpeed(50);
+      delay(2000);
+      my_car->SetDriveMode(car::DriveMode::Backward);
+      my_car->SetSpeed(100);
+      delay(2000);
+      my_car->SetDriveMode(car::DriveMode::Stop);
+      delay(2000);
+
+      // Check steering accuracy
+      my_car->TurnLeft(100);
+      delay(2000);
+      my_car->TurnLeft(0); // Zeroing
+      delay(2000);
+      my_car->TurnLeft(25);
+      delay(2000);
+      my_car->TurnLeft(50);
+      delay(2000);
+      my_car->TurnLeft(75);
+      delay(2000);
+      my_car->TurnLeft(100);
+      delay(2000);
+      my_car->TurnLeft(0); // Zeroing
+      delay(2000);
+      my_car->TurnRight(100);
+      delay(2000);
+      my_car->TurnRight(0); // Zeroing
+      delay(2000);
+      my_car->TurnRight(25);
+      delay(2000);
+      my_car->TurnRight(50);
+      delay(2000);
+      my_car->TurnRight(75);
+      delay(2000);
+      my_car->TurnRight(100);
+      delay(2000);
+      my_car->TurnRight(0); // Zeroing
+      delay(2000);
+    }
+
     // Serial.println("Device connected, setting value in TX");
     pTxCharacteristic->setValue(&txValue, 1);
     pTxCharacteristic->notify();
@@ -127,6 +164,9 @@ void loop()
   // disconnecting
   if (!deviceConnected && oldDeviceConnected)
   {
+    my_car->SetDriveMode(car::DriveMode::Stop);
+    digitalWrite(LED_PIN, LOW); // turn the LED off
+
     delay(500);                  // give the bluetooth stack the chance to get things ready
     pServer->startAdvertising(); // restart advertising
     Serial.println("start advertising");
