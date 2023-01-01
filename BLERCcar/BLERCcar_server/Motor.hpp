@@ -15,7 +15,7 @@ namespace car
         int Pin1{-1};
         int Pin2{-1};
 
-        Motor(){};
+        Motor();
         Motor(int pin1, int pin2, int enable1Pin, int pwmChannel);
         void SetSpeed(int speed);
         int speedPercentageToDutyCycle(int speed);

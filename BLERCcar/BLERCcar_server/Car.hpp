@@ -39,7 +39,7 @@ namespace car
         DriveMode m_mode;
         Motor driveShaft, steering;
         bool initMotors();
-        void stop();
+        void stop(bool zero_steer);
         void moveForward();
         void moveBackward();
         void zeroSteer();
@@ -102,7 +102,7 @@ void car::Car::stop(bool zero_steer = false)
     digitalWrite(driveShaft.Pin1, LOW);
     digitalWrite(driveShaft.Pin2, LOW);
     if (zero_steer)
-        zeroSteer()
+        zeroSteer();
 }
 
 void car::Car::moveForward()
