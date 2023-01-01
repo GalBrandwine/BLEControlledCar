@@ -1,9 +1,37 @@
-#pragma once
-
+#ifndef COMMON
+#define COMMON
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
 
-// These UUID's are NUS (Nordic Uart Service) https://developer.nordicsemi.com/nRF_Connect_SDK/doc/1.4.0/nrf/include/bluetooth/services/nus.html#api-documentation
-#define SERVICE_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E" // UART service UUID
-#define CHARACTERISTIC_UUID_RX "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
-#define CHARACTERISTIC_UUID_TX "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+/**
+ * @brief Bulk of my own UUID's
+ * Car service UUID: 10b47b82-89d8-11ed-a1eb-0242ac120002
+ * Characteristic Drive mode UUID: (CHARACTERISTIC_UUID_DRIVE_MODES) 10b47dee-89d8-11ed-a1eb-0242ac120002
+ * * Write
+ * * Wait-for-respond
+ * * Expected (Driving mode, accel amount)
+ * Characteristic Steering UUID: () 10b481ae-89d8-11ed-a1eb-0242ac120002
+ * * Write
+ * * Wait fro respond
+ * * Expected (Direction, steer_percentage)
+ * Unused
+ * 10b482e4-89d8-11ed-a1eb-0242ac120002
+ * Unused
+ * 10b48410-89d8-11ed-a1eb-0242ac120002
+ */
+
+const std::string CAR_BLE_SERVICE_UUID{"10b47b82-89d8-11ed-a1eb-0242ac120002"};
+const std::string CHARACTERISTIC_UUID_DRIVE_MODES{"10b47dee-89d8-11ed-a1eb-0242ac120002"};
+const std::string CHARACTERISTIC_UUID_STEERING{"10b481ae-89d8-11ed-a1eb-0242ac120002"};
+
+enum DriveMode
+{
+    Forward,
+    ForwardCollision,
+    Backward,
+    BackwardCollision,
+    Stop
+
+};
+
+#endif // COMMON

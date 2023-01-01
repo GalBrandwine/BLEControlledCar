@@ -1,18 +1,12 @@
-#pragma once
+#ifndef CAR;
+#define CAR
 #include <iostream>
+#include "/home/gal/dev/BLEControlledCar/BLERCcar/common/common.hpp"
+#include "Icontroller.hpp"
 #include "Motor.hpp"
 
 namespace car
 {
-    enum DriveMode
-    {
-        Forward,
-        ForwardCollision,
-        Backward,
-        BackwardCollision,
-        Stop
-
-    };
 
     const std::string mode_to_str(DriveMode mode)
     {
@@ -33,7 +27,7 @@ namespace car
         }
     }
 
-    class Car
+    class Car : public Icontroller
     {
     private:
         DriveMode m_mode;
@@ -46,13 +40,14 @@ namespace car
 
     public:
         Car();
-        void TurnLeft(int percentage);
-        void TurnRight(int percentage);
-        void SetSpeed(int speed);
+        ~Car() override { Serial.println("Car destructed..."); };
+        void TurnLeft(int percentage) override;
+        void TurnRight(int percentage) override;
+        void SetSpeed(int speed) override;
 
-        void SetDriveMode(DriveMode mode);
-        const DriveMode CurrentDriveMode() { return m_mode; };
-        const std::string CurrentDriveModeStr() { return mode_to_str(m_mode); };
+        void SetDriveMode(DriveMode mode) override;
+        const DriveMode CurrentDriveMode() override { return m_mode; };
+        const std::string CurrentDriveModeStr() override { return mode_to_str(m_mode); };
     };
 } // Car
 
@@ -177,3 +172,5 @@ void car::Car::SetDriveMode(DriveMode mode)
         Serial.println(mode_to_str(m_mode).c_str());
     }
 };
+
+#endif // CAR

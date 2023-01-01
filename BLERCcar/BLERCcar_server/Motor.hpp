@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MOTOR
+#define MOTOR
 namespace car
 {
     class Motor
@@ -68,3 +69,6 @@ namespace car
         return map(m_Pwmduty, 0, 255, 0, 100);
     }
 } // car
+
+
+#endif //MOTOR

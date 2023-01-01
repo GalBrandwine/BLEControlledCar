@@ -226,7 +226,8 @@
                 "/home/gal/dev/BLEControlledCar/BLERCcar/BLERCcar_client/lib/SimpleBLE/simplebluez/include",
                 "/home/gal/dev/BLEControlledCar/BLERCcar/BLERCcar_client/lib/SimpleBLE/simpledbus/include",
                 "/usr/lib/x86_64-linux-gnu/dbus-1.0/include",
-                "/usr/include/dbus-1.0"
+                "/usr/include/dbus-1.0",
+                "/home/gal/dev/BLEControlledCar/BLERCcar/**"
             ],
             "forcedInclude": [
                 "/home/gal/.arduino15/packages/esp32/hardware/esp32/2.0.5/cores/esp32/Arduino.h"
