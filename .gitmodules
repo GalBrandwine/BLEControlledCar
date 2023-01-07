@@ -1,3 +1,6 @@
 [submodule "BLERCcar/lib/SimpleBLE"]
 	path = BLERCcar/lib/SimpleBLE
 	url = git@github.com:GalBrandwine/SimpleBLE.git
+[submodule "spdlog"]
+	path = spdlog
+	url = git@github.com:gabime/spdlog.git
