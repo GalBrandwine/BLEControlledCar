@@ -4,49 +4,7 @@
 
 car::Car *my_car;
 ble_manager::BLEManager *ble_mgr;
-
-// bool deviceConnected = false;
 bool oldDeviceConnected = false;
-// bool client_connected = false;
-uint8_t txValue = 0;
-
-// class MyServerCallbacks : public BLEServerCallbacks
-// {
-//   void onConnect(BLEServer *pServer)
-//   {
-//     Serial.printf("Device %d, had connected\n", pServer->getConnId());
-//     deviceConnected = true;
-//     // client_connected = true; // turn the LED on
-//   };
-
-//   void onDisconnect(BLEServer *pServer)
-//   {
-//     Serial.printf("Device %d, had disconnected\n", pServer->getConnId());
-//     deviceConnected = false;
-//     // client_connected = false;
-//   }
-// };
-
-// class MyCallbacks : public BLECharacteristicCallbacks
-// {
-//   void onWrite(BLECharacteristic *pCharacteristic)
-//   {
-//     std::string rxValue = pCharacteristic->getValue();
-
-//     if (rxValue.length() > 0)
-//     {
-//       Serial.println("*********");
-//       Serial.print("Received Value: ");
-//       Serial.println(rxValue.c_str());
-//       for (int i = 0; i < rxValue.length(); i++)
-//         Serial.print(rxValue[i]);
-
-//       Serial.println();
-//       Serial.println("*********");
-//     }
-//   }
-// };
-
 void setup()
 {
 

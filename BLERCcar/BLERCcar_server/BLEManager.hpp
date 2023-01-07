@@ -17,7 +17,6 @@ namespace ble_manager
         {
             Serial.printf("Device %d, had connected\n", pServer->getConnId());
             deviceConnected = true;
-            digitalWrite(LED_PIN, HIGH); // turn the LED off
         };
 
         void onDisconnect(BLEServer *pServer)
@@ -38,18 +37,91 @@ namespace ble_manager
     public:
         BLEManager(Icontroller *controller);
         void onWrite(BLECharacteristic *pCharacteristic, esp_ble_gatts_cb_param_t *param) override;
-        void Advertise() { m_pServer->startAdvertising(); };
+        void Advertise();
         ~BLEManager();
     };
 
+    void ConnectivityLEDStuff_t(void *pvParameters);
+    /**
+     * @brief Init LED board configuration & start xTask
+     *
+     */
+    void InitConnectivityLEDStuff(BLEManager *m_pBLEManager)
+    {
+        // initialize digital pin LED_BUILTIN as an output.
+        pinMode(LED_PIN, OUTPUT);
+
+        // xTaskCreate should be in SETUP() function - if not the scheduler is not working properly, and there's a xTaskCreate shadowing.
+        xTaskCreate(
+            ConnectivityLEDStuff_t, // Function that should be called
+            "ConnectivityLED task", // Name of the task (for debugging)
+            10000,                  // Stack size (bytes)
+            m_pBLEManager,          // Parameter to pass
+            1,                      // Task priority
+            NULL                    // Task handle
+        );
+    }
+    /**
+     * @brief Task of connectivity LED. This run in the background
+     *
+     * @param pvParameters Pointer that will (dangerously) will be casted into BLEManager
+     */
+    void ConnectivityLEDStuff_t(void *pvParameters)
+    {
+        int TICKS = 100;
+        auto p_BLEManager = (BLEManager *)(pvParameters);
+
+        for (;;)
+        {
+            if (ble_manager::deviceConnected)
+            {
+                digitalWrite(LED_PIN, HIGH); // turn the LED on
+            }
+            /**
+             * @brief Blink while waiting for connection
+             *
+             */
+            else
+            {
+
+                /**
+                 * @brief Blink
+                 *
+                 */
+                while (!ble_manager::deviceConnected)
+                {
+                    digitalWrite(LED_PIN, HIGH); // Turn the LED on
+                    vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
+                    digitalWrite(LED_PIN, LOW); // Turn the LED off
+                    vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
+                    digitalWrite(LED_PIN, HIGH); // Turn the LED on
+                    vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
+                    digitalWrite(LED_PIN, LOW); // Turn the LED off
+                    vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
+                    vTaskDelay(pdMS_TO_TICKS(TICKS * 10));
+                }
+            }
+            vTaskDelay(pdMS_TO_TICKS(TICKS * 10));
+        }
+
+        vTaskDelete(NULL);
+    }
+
 } // ble_manager
 
-// // Serial.println("Device connected, setting value in TX");
-// pTxCharacteristic->setValue(&txValue, 1);
-// pTxCharacteristic->notify();
-// txValue++;
-// delay(10); // bluetooth stack will go into congestion, if too many packets are sent
+void ble_manager::BLEManager::Advertise()
+{
+    m_pServer->startAdvertising();
+};
 
+/**
+ * @brief Triggered when the Controller sending commands.
+ * This callback is triggered for all characteristics of this server,
+ * so within i need to filter desired logic based on callback characteristic.
+ *
+ * @param pCharacteristic
+ * @param param
+ */
 void ble_manager::BLEManager::onWrite(BLECharacteristic *pCharacteristic, esp_ble_gatts_cb_param_t *param)
 {
     Serial.println("Got onRead callback");
@@ -84,8 +156,7 @@ void ble_manager::BLEManager::onWrite(BLECharacteristic *pCharacteristic, esp_bl
 
 ble_manager::BLEManager::BLEManager(Icontroller *controller) : m_Controller(controller)
 {
-    // initialize digital pin LED_BUILTIN as an output.
-    pinMode(LED_PIN, OUTPUT);
+    InitConnectivityLEDStuff(this);
 
     // Create the BLE Device
     BLEDevice::init("BLE_RC_Car");
@@ -121,7 +192,7 @@ ble_manager::BLEManager::BLEManager(Icontroller *controller) : m_Controller(cont
     pService->start();
 
     // Start advertising
-    m_pServer->getAdvertising()->start();
+    m_pServer->startAdvertising();
 }
 
 ble_manager::BLEManager::~BLEManager()
