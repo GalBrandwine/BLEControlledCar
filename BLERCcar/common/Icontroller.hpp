@@ -1,7 +1,7 @@
 #ifndef ICONTROLLER
 #define ICONTROLLER
 
-#include "/home/gal/dev/BLEControlledCar/BLERCcar/common/common.hpp"
+#include "common.hpp"
 class Icontroller
 {
 public:

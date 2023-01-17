@@ -5,7 +5,7 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 #include "/home/gal/dev/BLEControlledCar/BLERCcar/common/common.hpp"
-#include "/home/gal/dev/BLEControlledCar/BLERCcar/BLERCcar_server/Icontroller.hpp"
+#include "/home/gal/dev/BLEControlledCar/BLERCcar/common/Icontroller.hpp"
 
 namespace ble_manager
 {
@@ -151,6 +151,26 @@ void ble_manager::BLEManager::onWrite(BLECharacteristic *pCharacteristic, esp_bl
     if (pCharacteristic->getUUID().toString() == CHARACTERISTIC_UUID_STEERING)
     {
         Serial.println("onRead callback triggered with CHARACTERISTIC_UUID_STEERING!!!");
+
+        std::string mode_accel = pCharacteristic->getValue();
+        Serial.print("Got raw value:");
+        Serial.println(mode_accel.c_str());
+        if (mode_accel.length() > 0)
+        {
+            // pCharacteristic->setValue() notify();
+            Serial.println("*********");
+            Serial.print("Received Value: ");
+            Serial.println(mode_accel.c_str());
+            // for (int i = 0; i < mode_accel.length(); i++)
+            //     Serial.print(rxValue[i]);
+
+            Serial.println();
+            Serial.println("*********");
+        }
+        else
+        {
+            Serial.println("onRead callback triggered with no data!!!");
+        }
     }
 }
 
@@ -169,7 +189,7 @@ ble_manager::BLEManager::BLEManager(Icontroller *controller) : m_Controller(cont
     BLEService *pService = m_pServer->createService(CAR_BLE_SERVICE_UUID);
 
     // Create a BLE Characteristic
-    // Ill use this characetirsic to sent data back to the client
+    // Ill use this characteristic to sent data back to the client
     // m_pTxCharacteristic = pService->createCharacteristic(
     //     CHARACTERISTIC_UUID_,
     //     BLECharacteristic::PROPERTY_NOTIFY); // See NOTIFY and other properties - https://embeddedcentric.com/lesson-2-ble-profiles-services-characteristics-device-roles-and-network-topology/

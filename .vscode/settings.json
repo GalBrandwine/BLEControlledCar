@@ -63,15 +63,30 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "bitset": "cpp",
+        "charconv": "cpp",
+        "regex": "cpp",
+        "future": "cpp",
+        "bit": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "numbers": "cpp",
+        "semaphore": "cpp",
+        "stop_token": "cpp"
     },
     "cSpell.words": [
+        "BLERC",
         "bluez",
         "Copercini",
         "Evandro",
+        "gatts",
+        "GPIO",
+        "Icontroller",
         "Kolban",
+        "ledc",
         "pwmduty"
     ],
-    "cmake.sourceDirectory": "${workspaceFolder}/BLERCcar/BLERCcar_client/lib/SimpleBLE/examples/simplebluez",
+    "cmake.sourceDirectory": "${workspaceFolder}/BLERCcar/BLERCcar_client",
     
 }

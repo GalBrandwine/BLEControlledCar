@@ -2,30 +2,12 @@
 #define CAR
 #include <iostream>
 #include "/home/gal/dev/BLEControlledCar/BLERCcar/common/common.hpp"
-#include "Icontroller.hpp"
+#include "/home/gal/dev/BLEControlledCar/BLERCcar/common/Icontroller.hpp"
 #include "Motor.hpp"
 
 namespace car
 {
 
-    const std::string mode_to_str(DriveMode mode)
-    {
-        switch (mode)
-        {
-        case Forward:
-            return "Forward";
-        case ForwardCollision:
-            return "ForwardCollision";
-        case Backward:
-            return "Backward";
-        case BackwardCollision:
-            return "BackwardCollision";
-        case Stop:
-            return "Stop";
-        default:
-            return "NotSupported";
-        }
-    }
 
     class Car : public Icontroller
     {

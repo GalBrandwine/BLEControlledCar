@@ -580,6 +580,22 @@
                 "__ATOMIC_RELEASE=3",
                 "USBCON"
             ]
+        },
+        {
+            "name": "Cpp",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/lib/x86_64-linux-gnu/dbus-1.0/include",
+                "/usr/include/dbus-1.0",
+                "/home/gal/dev/BLEControlledCar/BLERCcar/BLERCcar_client/lib/SimpleBLE/simplebluez/include",
+                "/home/gal/dev/BLEControlledCar/BLERCcar/BLERCcar_client/lib/SimpleBLE/simpledbus/include",
+                "/home/gal/dev/BLEControlledCar/BLERCcar/BLERCcar_client/lib/spdlog/include/spdlog"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64"
         }
     ]
 }
