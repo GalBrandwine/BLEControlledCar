@@ -37,31 +37,32 @@ bool BLERCCar_client::Connect(const std::string &server)
 {
     int selection{-1};
     auto adapters = m_Bluez.get_adapters();
-    std::cout << "Available adapters:" << std::endl;
+    spdlog::info("Available adapters:");
     if (adapters.size() == 1)
     {
         selection = 0;
     }
     else
     {
+        std::stringstream ss;
         for (int i = 0; i < adapters.size(); i++)
         {
-            std::cout << "[" << i << "] " << adapters[i]->identifier() << " [" << adapters[i]->address() << "]"
-                      << std::endl;
+            ss << "[" << i << "] " << adapters[i]->identifier() << " [" << adapters[i]->address() << "]"
+               << std::endl;
         }
-
-        std::cout << "Please select an adapter to scan: ";
+        spdlog::info(ss.str());
+        spdlog::info("Please select an adapter to scan: ");
         std::cin >> selection;
     }
 
     if (selection < 0 || selection >= adapters.size())
     {
-        std::cout << "Invalid selection" << std::endl;
-        return 1;
+        spdlog::error("invalid selection");
+        return false;
     }
 
     auto adapter = adapters[selection];
-    std::cout << "Scanning " << adapter->identifier() << " [" << adapter->address() << "]" << std::endl;
+    spdlog::info("Scanning {} [{}]", adapter->identifier(), adapter->address());
 
     SimpleBluez::Adapter::DiscoveryFilter filter;
     filter.Transport = SimpleBluez::Adapter::DiscoveryFilter::TransportType::LE;
@@ -70,7 +71,7 @@ bool BLERCCar_client::Connect(const std::string &server)
     adapter->set_on_device_updated([&](std::shared_ptr<SimpleBluez::Device> device)
                                    {
         if (std::find(m_Peripherals.begin(), m_Peripherals.end(), device) == m_Peripherals.end()) {
-             std::cout << "Found device: " << device->name() << " [" << device->address() << "]" << std::endl;
+             spdlog::info("Found device: {} [{}]",device->name(),device->address());
             m_Peripherals.push_back(device);
         } });
 
@@ -78,34 +79,38 @@ bool BLERCCar_client::Connect(const std::string &server)
     millisecond_delay(3000);
     adapter->discovery_stop();
 
-    std::cout << "The following devices were found:" << std::endl;
+    spdlog::info("The following devices were found:");
     int server_idx = -1;
-    // const std::string my_device{"78:E3:6D:65:45:22"};
+    std::stringstream ss;
 
     for (int i = 0; i < m_Peripherals.size(); i++)
     {
+
+        ss << "[" << i << "] " << m_Peripherals[i]->name() << " [" << m_Peripherals[i]->address() << "]"
+           << std::endl;
+
         if (m_Peripherals[i]->address() == server)
         {
             server_idx = i;
             break;
         }
-        std::cout << "[" << i << "] " << m_Peripherals[i]->name() << " [" << m_Peripherals[i]->address() << "]"
-                  << std::endl;
     }
+    spdlog::info(ss.str());
+
     if (server_idx < 0)
     {
-        std::cout << "Could not find device" << server.c_str() << "\n";
-        return 0;
+        spdlog::error("Could not find device {}", server.c_str());
+        return false;
     }
     else
     {
-        std::cout << "BLE CR Car found: " << server.c_str() << "\n";
+        spdlog::info("Find device {}", server.c_str());
     }
 
     m_Peripheral = m_Peripherals[server_idx];
-    std::cout << "Connecting to " << m_Peripheral->name() << " [" << m_Peripheral->address() << "]" << std::endl;
+    spdlog::info("Connecting to {} [{}]", m_Peripheral->name(), m_Peripheral->address());
 
-    for (int attempt = 0; attempt < 5; attempt++)
+    for (int attempt = 0; attempt < m_ConnectionAttempts; attempt++)
     {
         try
         {
@@ -114,13 +119,14 @@ bool BLERCCar_client::Connect(const std::string &server)
         }
         catch (SimpleDBus::Exception::SendFailed &e)
         {
+            spdlog::info("Retrying [{}]", m_ConnectionAttempts - attempt);
             millisecond_delay(100);
         }
     }
 
     if (!m_Peripheral->connected() || !m_Peripheral->services_resolved())
     {
-        std::cout << "Failed to connect to " << m_Peripheral->name() << " [" << m_Peripheral->address() << "]" << std::endl;
+        spdlog::error("Failed to connect to {} [{}]", m_Peripheral->name(), m_Peripheral->address());
         return false;
     }
 

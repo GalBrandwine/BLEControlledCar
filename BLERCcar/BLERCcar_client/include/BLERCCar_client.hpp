@@ -34,7 +34,7 @@ class BLERCCar_client : public Icontroller
 {
 private:
     SimpleBluez::Bluez m_Bluez;
-
+    const int m_ConnectionAttempts{5};
     std::atomic<bool> m_AsyncThreadActive{true};
     std::thread *m_async_thread;
     std::vector<std::shared_ptr<SimpleBluez::Device>> m_Peripherals; // BLE related
