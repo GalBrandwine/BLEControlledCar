@@ -36,7 +36,8 @@ private:
     SimpleBluez::Bluez m_Bluez;
     const int m_ConnectionAttempts{5};
     std::atomic<bool> m_AsyncThreadActive{true};
-    std::thread *m_async_thread;
+    std::atomic<int16_t> m_ConnectionRssi{-1};
+    std::unordered_map<std::string, std::thread *> m_Async_thread_arr;
     std::vector<std::shared_ptr<SimpleBluez::Device>> m_Peripherals; // BLE related
     std::unordered_map<std::string, std::pair<std::shared_ptr<SimpleBluez::Service>, std::shared_ptr<SimpleBluez::Characteristic>>>
         m_CharMap;
@@ -47,6 +48,12 @@ private:
     std::shared_ptr<SimpleBluez::Device> m_Peripheral;
     void mapCharacteristics();
     void disconnect();
+
+    /**
+     * @brief Read the peripheral RSSI
+     *
+     */
+    void initRssiReadThread();
 
 public:
     BLERCCar_client(/* args */);
@@ -61,9 +68,9 @@ public:
     bool Connect(const std::string &server);
     void Disconnect();
 
-    void TurnLeft(int percentage) override;
-    void TurnRight(int percentage) override{};
-    void SetSpeed(int speed) override{};
+    void TurnLeft(const uint8_t percentage) override;
+    void TurnRight(const uint8_t percentage) override{};
+    void SetSpeed(const uint8_t speed) override{};
     void SetDriveMode(DriveMode mode) override{};
     const DriveMode CurrentDriveMode() override { return DriveMode::Stop; };
     const std::string CurrentDriveModeStr() override { return mode_to_str((DriveMode)99); };

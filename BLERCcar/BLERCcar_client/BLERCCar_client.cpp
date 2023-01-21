@@ -6,8 +6,8 @@ BLERCCar_client::BLERCCar_client(/* args */)
     spdlog::set_level(spdlog::level::debug); // Set global log level to info
 
     m_Bluez.init();
-    m_async_thread = new std::thread([&]()
-                                     { 
+    m_Async_thread_arr["BluezKeepAlive"] = new std::thread([&]()
+                                                           { 
         while (m_AsyncThreadActive){
         m_Bluez.run_async();
         std::this_thread::sleep_for(std::chrono::microseconds(100));
@@ -129,36 +129,53 @@ bool BLERCCar_client::Connect(const std::string &server)
         spdlog::error("Failed to connect to {} [{}]", m_Peripheral->name(), m_Peripheral->address());
         return false;
     }
-
+    initRssiReadThread();
     mapCharacteristics();
     return true;
 }
 
+void BLERCCar_client::initRssiReadThread()
+{
+    m_Async_thread_arr["ConnectionRssi"] = new std::thread([&]()
+                                                           {
+        while (m_AsyncThreadActive)
+        {
+            auto rssi = m_Peripheral->rssi();
+            m_ConnectionRssi = rssi;
+            spdlog::debug("Connection RSSI: {}", rssi);
+            millisecond_delay(500);
+        } });
+}
 void BLERCCar_client::disconnect()
 {
+    spdlog::debug("Start {}", __PRETTY_FUNCTION__);
     m_Peripheral->disconnect();
 
     millisecond_delay(1000);
 
     m_AsyncThreadActive = false;
-    while (!m_async_thread->joinable())
+    for (auto &&async_t : m_Async_thread_arr)
     {
-        spdlog::info("Disconnecting from {}\n", m_Peripheral->name());
-        millisecond_delay(10);
+        while (!async_t.second->joinable())
+        {
+            spdlog::info("Disconnecting from {}. Waiting for {} to stop working", m_Peripheral->name(), async_t.first);
+            millisecond_delay(10);
+        }
+        async_t.second->join();
+        delete async_t.second;
     }
-    m_async_thread->join();
-    delete m_async_thread;
+    spdlog::debug("Finish {}", __PRETTY_FUNCTION__);
 }
 void BLERCCar_client::Disconnect()
 {
     disconnect();
 }
 
-void BLERCCar_client::TurnLeft(int percentage)
+void BLERCCar_client::TurnLeft(const uint8_t percentage)
 {
-    spdlog::debug("Start {}\n", __PRETTY_FUNCTION__);
+    spdlog::debug("Start {}", __PRETTY_FUNCTION__);
     auto steering_characteristic = m_CharMap[CHARACTERISTIC_UUID_STEERING].second;
-    auto ba = SimpleBluez::ByteArray("L" + percentage);
-    steering_characteristic->write_command(ba);
-    spdlog::debug("Finish {}\n", __PRETTY_FUNCTION__);
+    BLESteerLeftPacket packet{percentage};
+    steering_characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
+    spdlog::debug("Finish {}", __PRETTY_FUNCTION__);
 }

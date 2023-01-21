@@ -150,27 +150,44 @@ void ble_manager::BLEManager::onWrite(BLECharacteristic *pCharacteristic, esp_bl
 
     if (pCharacteristic->getUUID().toString() == CHARACTERISTIC_UUID_STEERING)
     {
-        Serial.println("onRead callback triggered with CHARACTERISTIC_UUID_STEERING!!!");
 
-        std::string mode_accel = pCharacteristic->getValue();
-        Serial.print("Got raw value:");
-        Serial.println(mode_accel.c_str());
-        if (mode_accel.length() > 0)
+        auto raw = (char *)(pCharacteristic->getData());
+        if (!raw)
         {
-            // pCharacteristic->setValue() notify();
-            Serial.println("*********");
-            Serial.print("Received Value: ");
-            Serial.println(mode_accel.c_str());
-            // for (int i = 0; i < mode_accel.length(); i++)
-            //     Serial.print(rxValue[i]);
+            Serial.println("[warn] onRead callback triggered with no data!!!");
+            return;
+        }
 
-            Serial.println();
-            Serial.println("*********");
-        }
-        else
+        if (raw[0] == 'L')
         {
-            Serial.println("onRead callback triggered with no data!!!");
+            auto packet = BLESteerLeftPacket(raw);
+            Serial.print("Got Steer left command with amount: ");
+            Serial.println(packet.GetAmount());
+            m_Controller->TurnLeft(packet.GetAmount());
         }
+
+        if (raw[0] == 'R')
+        {
+            auto packet = BLESteerRightPacket(raw);
+            Serial.print("Got Steer right command with amount: ");
+            Serial.println(packet.GetAmount());
+            m_Controller->TurnRight(packet.GetAmount());
+        }
+
+        Serial.print("Got raw value: ");
+        Serial.println(raw);
+        // if (raw.length() > 0)
+        // {
+        //     // pCharacteristic->setValue() notify();
+        //     Serial.println("*********");
+        //     Serial.print("Received Value: ");
+        //     Serial.println(raw.c_str());
+        //     // for (int i = 0; i < mode_accel.length(); i++)
+        //     //     Serial.print(rxValue[i]);
+
+        //     Serial.println();
+        //     Serial.println("*********");
+        // }
     }
 }
 

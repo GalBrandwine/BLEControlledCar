@@ -1,6 +1,7 @@
 #ifndef COMMON
 #define COMMON
 #include <iostream>
+#include "BLERCCar_packets.hpp"
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
 

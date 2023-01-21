@@ -85,7 +85,8 @@
         "Icontroller",
         "Kolban",
         "ledc",
-        "pwmduty"
+        "pwmduty",
+        "spdlog"
     ],
     "cmake.sourceDirectory": "${workspaceFolder}/BLERCcar/BLERCcar_client",
     

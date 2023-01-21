@@ -18,8 +18,8 @@ namespace car
 
         Motor();
         Motor(int pin1, int pin2, int enable1Pin, int pwmChannel);
-        void SetSpeed(int speed);
-        int speedPercentageToDutyCycle(int speed);
+        void SetSpeed(const char speed);
+        int speedPercentageToDutyCycle(const char speed);
         int CurrentSpeedPercentage();
     };
 
@@ -49,7 +49,7 @@ namespace car
         ledcWrite(m_PwmChannel, m_Pwmduty);
     };
 
-    void Motor::SetSpeed(int speed)
+    void Motor::SetSpeed(const char speed)
     {
         m_Pwmduty = speedPercentageToDutyCycle(speed);
         Serial.println(__PRETTY_FUNCTION__);
@@ -58,7 +58,7 @@ namespace car
         ledcWrite(m_PwmChannel, m_Pwmduty);
     }
 
-    int Motor::speedPercentageToDutyCycle(int speed)
+    int Motor::speedPercentageToDutyCycle(const char speed)
     {
         return map(speed, 0, 100, 0, 255);
     }
@@ -70,5 +70,4 @@ namespace car
     }
 } // car
 
-
-#endif //MOTOR
+#endif // MOTOR

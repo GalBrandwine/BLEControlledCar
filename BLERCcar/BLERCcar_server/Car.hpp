@@ -1,4 +1,4 @@
-#ifndef CAR;
+#ifndef CAR
 #define CAR
 #include <iostream>
 #include "/home/gal/dev/BLEControlledCar/BLERCcar/common/common.hpp"
@@ -23,9 +23,9 @@ namespace car
     public:
         Car();
         ~Car() override { Serial.println("Car destructed..."); };
-        void TurnLeft(int percentage) override;
-        void TurnRight(int percentage) override;
-        void SetSpeed(int speed) override;
+        void TurnLeft(const char percentage) override;
+        void TurnRight(const char percentage) override;
+        void SetSpeed(const char speed) override;
 
         void SetDriveMode(DriveMode mode) override;
         const DriveMode CurrentDriveMode() override { return m_mode; };
@@ -61,7 +61,7 @@ bool car::Car::initMotors()
  *
  * @param speed percentage value [0,100]
  */
-void car::Car::SetSpeed(int speed)
+void car::Car::SetSpeed(const char speed)
 {
     if (m_mode == Stop)
     {
@@ -106,7 +106,7 @@ void car::Car::zeroSteer()
     digitalWrite(steering.Pin2, LOW);
 }
 
-void car::Car::TurnLeft(int percentage)
+void car::Car::TurnLeft(const char percentage)
 {
     if (percentage == 0)
         zeroSteer();
@@ -118,7 +118,7 @@ void car::Car::TurnLeft(int percentage)
     digitalWrite(steering.Pin1, HIGH);
     digitalWrite(steering.Pin2, LOW);
 }
-void car::Car::TurnRight(int percentage)
+void car::Car::TurnRight(const char percentage)
 {
     if (percentage == 0)
         zeroSteer();
