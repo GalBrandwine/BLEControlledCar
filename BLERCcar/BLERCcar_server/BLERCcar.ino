@@ -4,7 +4,7 @@
 #include "/home/gal/dev/BLEControlledCar/BLERCcar/common/Icontroller.hpp"
 
 car::Car *my_car;
-ble_manager::BLEManager *ble_mgr;
+ble::BLEManager *ble_mgr;
 bool oldDeviceConnected = false;
 void setup()
 {
@@ -12,7 +12,7 @@ void setup()
   Serial.begin(115200);
 
   my_car = new car::Car();
-  ble_mgr = new ble_manager::BLEManager(my_car);
+  ble_mgr = new ble::BLEManager(my_car);
 
   Serial.println("Waiting a client connection to notify...");
 }
@@ -20,7 +20,7 @@ void setup()
 void loop()
 {
 
-  if (ble_manager::deviceConnected)
+  if (ble_mgr->GetContext().IsDeviceConnected)
   {
     // if (play_once)
     // {
@@ -80,20 +80,21 @@ void loop()
   }
 
   // disconnecting
-  if (!ble_manager::deviceConnected && oldDeviceConnected)
+  if (!ble_mgr->GetContext().IsDeviceConnected && oldDeviceConnected)
   {
     my_car->SetDriveMode(DriveMode::Stop);
-
     delay(500); // give the bluetooth stack the chance to get things ready
     // pServer->startAdvertising(); // restart advertising
     ble_mgr->Advertise();
     Serial.println("start advertising");
-    oldDeviceConnected = ble_manager::deviceConnected;
+    oldDeviceConnected = ble_mgr->GetContext().IsDeviceConnected;
   }
   // connecting
-  if (ble_manager::deviceConnected && !oldDeviceConnected)
+  if (ble_mgr->GetContext().IsDeviceConnected && !oldDeviceConnected)
   {
     // do stuff here on connecting
-    oldDeviceConnected = ble_manager::deviceConnected;
+    oldDeviceConnected = ble_mgr->GetContext().IsDeviceConnected;
   }
+
+  // delay(500); // Avoid burnout
 }

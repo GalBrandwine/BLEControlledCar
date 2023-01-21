@@ -68,9 +68,9 @@ public:
     bool Connect(const std::string &server);
     void Disconnect();
 
-    void TurnLeft(const uint8_t percentage) override;
-    void TurnRight(const uint8_t percentage) override{};
-    void SetSpeed(const uint8_t speed) override{};
+    void TurnLeft(const char percentage) override;
+    void TurnRight(const char percentage) override{};
+    void SetSpeed(const char speed) override{};
     void SetDriveMode(DriveMode mode) override{};
     const DriveMode CurrentDriveMode() override { return DriveMode::Stop; };
     const std::string CurrentDriveModeStr() override { return mode_to_str((DriveMode)99); };

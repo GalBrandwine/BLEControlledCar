@@ -171,7 +171,7 @@ void BLERCCar_client::Disconnect()
     disconnect();
 }
 
-void BLERCCar_client::TurnLeft(const uint8_t percentage)
+void BLERCCar_client::TurnLeft(const char percentage)
 {
     spdlog::debug("Start {}", __PRETTY_FUNCTION__);
     auto steering_characteristic = m_CharMap[CHARACTERISTIC_UUID_STEERING].second;

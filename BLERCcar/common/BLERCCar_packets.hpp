@@ -4,24 +4,24 @@
 class BLERCCarPacket
 {
 protected:
-    const int8_t m_Command;
-    const int8_t m_Amount;
-    const int8_t raw[2];
+    const char m_Command;
+    const char m_Amount;
+    const char raw[2];
 
 public:
     BLERCCarPacket() = delete;
-    BLERCCarPacket(const int8_t command, const int8_t amount) : m_Command{command}, m_Amount{amount}, raw{m_Command, m_Amount} {};
+    BLERCCarPacket(const char command, const char amount) : m_Command{command}, m_Amount{amount}, raw{m_Command, m_Amount} {};
     ~BLERCCarPacket(){};
 
-    const int8_t *GetPayload()
+    const char *GetPayload()
     {
         return raw;
     };
-    const int8_t GetCommand()
+    const char GetCommand()
     {
         return m_Command;
     };
-    const int8_t GetAmount()
+    const char GetAmount()
     {
         return m_Amount;
     };
@@ -32,14 +32,14 @@ class BLESteerLeftPacket : public BLERCCarPacket
 private:
 public:
     BLESteerLeftPacket() = delete;
-    BLESteerLeftPacket(const int8_t amount) : BLERCCarPacket('L', amount){};
+    BLESteerLeftPacket(const char amount) : BLERCCarPacket('L', amount){};
     /**
      * @brief Construct a new BLESteerLeftPacket object.
      * @note This constructor is unsafe. No safety checks on payload
      *
      * @param payload
      */
-    BLESteerLeftPacket(const int8_t *payload) : BLERCCarPacket(payload[0], payload[1]){};
+    BLESteerLeftPacket(const char *payload) : BLERCCarPacket(payload[0], payload[1]){};
     ~BLESteerLeftPacket(){};
 };
 
@@ -48,8 +48,8 @@ class BLESteerRightPacket : public BLERCCarPacket
 private:
 public:
     BLESteerRightPacket() = delete;
-    BLESteerRightPacket(const int8_t amount) : BLERCCarPacket('R', amount){};
-    BLESteerRightPacket(const int8_t *payload) : BLERCCarPacket(payload[0], payload[1]){};
+    BLESteerRightPacket(const char amount) : BLERCCarPacket('R', amount){};
+    BLESteerRightPacket(const char *payload) : BLERCCarPacket(payload[0], payload[1]){};
     ~BLESteerRightPacket(){};
 };
 #endif // BLERCCAR_PACKETS
