@@ -5,6 +5,7 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 #include "BLEManager_context.hpp"
+#include "/home/gal/dev/BLEControlledCar/BLERCcar/common/BLERCCar_packets.hpp"
 #include "/home/gal/dev/BLEControlledCar/BLERCcar/common/Icontroller.hpp"
 
 namespace ble
@@ -12,10 +13,10 @@ namespace ble
     class MyServerCallbacks : public BLEServerCallbacks
     {
     private:
-        ble_ctx &m_BLEManager_context;
+        Context &m_BLEManager_context;
 
     public:
-        MyServerCallbacks(ble_ctx &ble_manager_context) : m_BLEManager_context{ble_manager_context} {};
+        MyServerCallbacks(Context &ble_manager_context) : m_BLEManager_context{ble_manager_context} {};
         void onConnect(BLEServer *pServer)
         {
             Serial.printf("Device %d, had connected\n", pServer->getConnId());
@@ -33,10 +34,10 @@ namespace ble
     class MyCharCallbacks : public BLECharacteristicCallbacks
     {
     private:
-        ble_ctx &m_BLEManager_context;
+        Context &m_BLEManager_context;
 
     public:
-        MyCharCallbacks(ble_ctx &ble_manager_context) : m_BLEManager_context{ble_manager_context} {};
+        MyCharCallbacks(Context &ble_manager_context) : m_BLEManager_context{ble_manager_context} {};
         /**
          * @brief Triggered when the Controller sending commands.
          * This callback is triggered for all characteristics of this server,
@@ -51,24 +52,26 @@ namespace ble
             Serial.println(pCharacteristic->getUUID().toString().c_str());
             if (pCharacteristic->getUUID().toString() == CHARACTERISTIC_UUID_DRIVE_MODES)
             {
-                std::string mode_accel = pCharacteristic->getValue();
-
-                if (mode_accel.length() > 0)
+                auto raw = (char *)(pCharacteristic->getData());
+                if (!raw)
                 {
-                    // pCharacteristic->setValue() notify();
-                    Serial.println("*********");
-                    Serial.print("Received Value: ");
-                    Serial.println(mode_accel.c_str());
-                    // for (int i = 0; i < mode_accel.length(); i++)
-                    //     Serial.print(rxValue[i]);
+                    Serial.println("[warn][CHARACTERISTIC_UUID_DRIVE_MODES] onRead callback triggered with no data!!!");
+                    return;
+                }
 
-                    Serial.println();
-                    Serial.println("*********");
-                }
-                else
+                BLEDrivePacket packet{raw};
+                if (packet.GetDriveMode() == DriveMode::Unsupported)
                 {
-                    Serial.println("onRead callback triggered with no data!!!");
+                    Serial.printf("[warn][CHARACTERISTIC_UUID_DRIVE_MODES] onRead callback triggered with UNSUPPORTED DRIVEMODE: %d !!!\n", raw[0]);
+                    return;
                 }
+                Serial.printf("Got drive mode: %s [raw: %d]\nWith amount: %d\n", mode_to_str(packet.GetDriveMode()).c_str(), raw[0], packet.GetAmount());
+
+                m_BLEManager_context.Controller->SetDriveMode(packet.GetDriveMode());
+                m_BLEManager_context.Controller->SetSpeed(packet.GetAmount());
+                
+                Serial.print("Got raw value: ");
+                Serial.println(raw);
             }
 
             if (pCharacteristic->getUUID().toString() == CHARACTERISTIC_UUID_STEERING)
@@ -77,13 +80,13 @@ namespace ble
                 auto raw = (char *)(pCharacteristic->getData());
                 if (!raw)
                 {
-                    Serial.println("[warn] onRead callback triggered with no data!!!");
+                    Serial.println("[warn][CHARACTERISTIC_UUID_STEERING] onRead callback triggered with no data!!!");
                     return;
                 }
 
                 if (raw[0] == 'L')
                 {
-                    auto packet = BLESteerLeftPacket(raw);
+                    BLESteerLeftPacket packet{raw};
                     Serial.print("Got Steer left command with amount: ");
                     Serial.println(packet.GetAmount());
                     m_BLEManager_context.Controller->TurnLeft(packet.GetAmount());
@@ -91,7 +94,7 @@ namespace ble
 
                 if (raw[0] == 'R')
                 {
-                    auto packet = BLESteerRightPacket(raw);
+                    BLESteerRightPacket packet{raw};
                     Serial.print("Got Steer right command with amount: ");
                     Serial.println(packet.GetAmount());
                     m_BLEManager_context.Controller->TurnRight(packet.GetAmount());
@@ -99,18 +102,6 @@ namespace ble
 
                 Serial.print("Got raw value: ");
                 Serial.println(raw);
-                // if (raw.length() > 0)
-                // {
-                //     // pCharacteristic->setValue() notify();
-                //     Serial.println("*********");
-                //     Serial.print("Received Value: ");
-                //     Serial.println(raw.c_str());
-                //     // for (int i = 0; i < mode_accel.length(); i++)
-                //     //     Serial.print(rxValue[i]);
-
-                //     Serial.println();
-                //     Serial.println("*********");
-                // }
             }
         }
     };

@@ -17,10 +17,10 @@ namespace ble
         MyCharCallbacks *m_pMyCharCallbacks{NULL};
         BLEServer *m_pServer{NULL};
         BLECharacteristic *m_pTxCharacteristic{NULL};
-        ble_ctx m_BLEManager_ctx;
+        Context m_BLEManager_ctx;
 
     public:
-        ble_ctx &GetContext() { return m_BLEManager_ctx; };
+        const Context &GetContext() const { return m_BLEManager_ctx; };
         BLEManager(Icontroller *controller);
         void Advertise();
         ~BLEManager();
@@ -34,18 +34,20 @@ namespace ble
     void InitConnectivityLEDStuff(BLEManager *pBLEManager)
     {
         // initialize digital pin LED_BUILTIN as an output.
-        pinMode(pBLEManager->GetContext().LED_PIN, OUTPUT);
+        auto led = pBLEManager->GetContext().LED_PIN;
+        pinMode(led, OUTPUT);
 
         // xTaskCreate should be in SETUP() function - if not the scheduler is not working properly, and there's a xTaskCreate shadowing.
         xTaskCreate(
             ConnectivityLEDStuff_t, // Function that should be called
             "ConnectivityLED task", // Name of the task (for debugging)
             10000,                  // Stack size (bytes)
-            pBLEManager,          // Parameter to pass
+            pBLEManager,            // Parameter to pass
             1,                      // Task priority
             NULL                    // Task handle
         );
     }
+
     /**
      * @brief Task of connectivity LED. This run in the background
      *
@@ -59,8 +61,10 @@ namespace ble
 
         for (;;)
         {
-            if (pBLEManager->GetContext().IsDeviceConnected = true)
+            if ((pBLEManager->GetContext()).IsDeviceConnected)
             {
+                // Serial.println(__PRETTY_FUNCTION__);
+                // Serial.printf("Device connected LED: %d\n", led);
                 digitalWrite(led, HIGH); // turn the LED on
             }
             /**
@@ -69,12 +73,13 @@ namespace ble
              */
             else
             {
-
+                // Serial.println(__PRETTY_FUNCTION__);
+                // Serial.printf("Waiting for connection LED: %d\n", led);
                 /**
                  * @brief Blink
                  *
                  */
-                while (pBLEManager->GetContext().IsDeviceConnected = false)
+                while (!(pBLEManager->GetContext()).IsDeviceConnected)
                 {
                     digitalWrite(led, HIGH); // Turn the LED on
                     vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
@@ -148,6 +153,9 @@ ble::BLEManager::BLEManager(Icontroller *controller)
 
 ble::BLEManager::~BLEManager()
 {
+    delete m_pMyCharCallbacks;
+    delete m_pServerCallbacks;
+    delete m_pServer;
 }
 
 #endif // BLE_MANAGER

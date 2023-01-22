@@ -1,16 +1,20 @@
 #ifndef MOTOR
 #define MOTOR
+
+const char MIN_PWM{150};
+const char MAX_PWM{255};
 namespace car
 {
     class Motor
     {
+
     private:
         int m_Enable1Pin{-1};
         // Setting PWM properties
         int m_Freq{30000};
         int m_PwmChannel{-1};
         int m_Resolution{8};
-        int m_Pwmduty{200};
+        int m_Pwmduty{MIN_PWM};
 
     public:
         int Pin1{-1};
@@ -60,13 +64,13 @@ namespace car
 
     int Motor::speedPercentageToDutyCycle(const char speed)
     {
-        return map(speed, 0, 100, 0, 255);
+        return map(speed, 0, 100, MIN_PWM, MAX_PWM);
     }
     int Motor::CurrentSpeedPercentage()
     {
         Serial.println(__PRETTY_FUNCTION__);
         Serial.printf("Pwmduty: %d\n", m_Pwmduty);
-        return map(m_Pwmduty, 0, 255, 0, 100);
+        return map(m_Pwmduty, MIN_PWM, MAX_PWM, 0, 100);
     }
 } // car
 

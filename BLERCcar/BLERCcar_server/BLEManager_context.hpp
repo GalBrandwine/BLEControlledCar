@@ -3,12 +3,11 @@
 #include "/home/gal/dev/BLEControlledCar/BLERCcar/common/Icontroller.hpp"
 namespace ble
 {
-    struct ble_ctx
+    struct Context
     {
         const char LED_PIN = 23;
         bool IsDeviceConnected{false};
         Icontroller *Controller;
-        // Data members
 
     } // types, *types
     ;

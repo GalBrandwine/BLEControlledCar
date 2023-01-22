@@ -11,7 +11,7 @@
 #include "spdlog/spdlog.h"
 #include "common.hpp"
 #include "Icontroller.hpp"
-
+#include "BLERCCar_packets.hpp"
 static void millisecond_delay(int ms)
 {
     for (int i = 0; i < ms; i++)
@@ -69,9 +69,10 @@ public:
     void Disconnect();
 
     void TurnLeft(const char percentage) override;
-    void TurnRight(const char percentage) override{};
+    void TurnRight(const char percentage) override;
     void SetSpeed(const char speed) override{};
-    void SetDriveMode(DriveMode mode) override{};
+    void SetSpeed(const DriveMode &mode, const char speed) override;
+    void SetDriveMode(DriveMode mode) override;
     const DriveMode CurrentDriveMode() override { return DriveMode::Stop; };
     const std::string CurrentDriveModeStr() override { return mode_to_str((DriveMode)99); };
 };

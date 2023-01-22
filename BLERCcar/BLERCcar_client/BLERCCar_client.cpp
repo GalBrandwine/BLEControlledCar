@@ -179,3 +179,36 @@ void BLERCCar_client::TurnLeft(const char percentage)
     steering_characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
     spdlog::debug("Finish {}", __PRETTY_FUNCTION__);
 }
+
+void BLERCCar_client::TurnRight(const char percentage)
+{
+    spdlog::debug("Start {}", __PRETTY_FUNCTION__);
+    auto steering_characteristic = m_CharMap[CHARACTERISTIC_UUID_STEERING].second;
+    BLESteerRightPacket packet{percentage};
+    steering_characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
+    spdlog::debug("Finish {}", __PRETTY_FUNCTION__);
+}
+
+void BLERCCar_client::SetDriveMode(DriveMode mode)
+{
+    spdlog::debug("Start {}", __PRETTY_FUNCTION__);
+    auto characteristic = m_CharMap[CHARACTERISTIC_UUID_DRIVE_MODES].second;
+    BLEDrivePacket packet{mode, 0};
+    characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
+    // auto got = characteristic->read();
+    spdlog::debug("Finish {}", __PRETTY_FUNCTION__);
+}
+
+void BLERCCar_client::SetSpeed(const DriveMode &mode, const char speed)
+{
+    spdlog::debug("Start {}", __PRETTY_FUNCTION__);
+    auto characteristic = m_CharMap[CHARACTERISTIC_UUID_DRIVE_MODES].second;
+
+    // Do we care about Current DriveMode?
+    // auto got = characteristic->read();
+
+    BLEDrivePacket packet{mode, speed};
+    characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
+
+    spdlog::debug("Finish {}", __PRETTY_FUNCTION__);
+}

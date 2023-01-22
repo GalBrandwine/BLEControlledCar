@@ -8,7 +8,6 @@
 namespace car
 {
 
-
     class Car : public Icontroller
     {
     private:
@@ -26,7 +25,7 @@ namespace car
         void TurnLeft(const char percentage) override;
         void TurnRight(const char percentage) override;
         void SetSpeed(const char speed) override;
-
+        void SetSpeed(const DriveMode &mode, const char speed) override{};
         void SetDriveMode(DriveMode mode) override;
         const DriveMode CurrentDriveMode() override { return m_mode; };
         const std::string CurrentDriveModeStr() override { return mode_to_str(m_mode); };
@@ -72,6 +71,11 @@ void car::Car::SetSpeed(const char speed)
     driveShaft.SetSpeed(speed);
 }
 
+/**
+ * @brief Stops the car, turn off driveshaft power
+ *
+ * @param zero_steer if true - align wheels as well
+ */
 void car::Car::stop(bool zero_steer = false)
 {
     // Stop the DC motor
@@ -133,26 +137,35 @@ void car::Car::TurnRight(const char percentage)
 
 void car::Car::SetDriveMode(DriveMode mode)
 {
+    Serial.println(__PRETTY_FUNCTION__);
     if (mode != m_mode)
     {
-        m_mode = mode;
+
         switch (mode)
         {
         case Forward:
+            m_mode = mode;
             moveForward();
             break;
         case Backward:
+            m_mode = mode;
             moveBackward();
             break;
         case Stop:
+            m_mode = mode;
             stop(true);
             break;
         default:
+            m_mode = DriveMode::Stop;
+            Serial.print("Called with unsupported mode, setting Stop");
             break;
         }
         Serial.print("Setting DriveMode: ");
         Serial.println(mode_to_str(m_mode).c_str());
+        return;
     }
+
+    Serial.printf("Called with mode: %s. But mode is already: %s\n", mode_to_str(mode).c_str(), mode_to_str(m_mode).c_str());
 };
 
 #endif // CAR

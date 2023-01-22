@@ -1,7 +1,7 @@
 #ifndef COMMON
 #define COMMON
 #include <iostream>
-#include "BLERCCar_packets.hpp"
+
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
 
@@ -17,12 +17,18 @@
  * * Wait fro respond
  * * Expected (Direction, steer_percentage)
  * Unused
- * 10b482e4-89d8-11ed-a1eb-0242ac120002
- * Unused
- * 10b48410-89d8-11ed-a1eb-0242ac120002
+ * * 10b482e4-89d8-11ed-a1eb-0242ac120002
+ * * 10b48410-89d8-11ed-a1eb-0242ac120002
  */
 
 const std::string CAR_BLE_SERVICE_UUID{"10b47b82-89d8-11ed-a1eb-0242ac120002"};
+
+/**
+ * @brief Characteristic Drive mode UUID: (CHARACTERISTIC_UUID_DRIVE_MODES) 10b47dee-89d8-11ed-a1eb-0242ac120002
+ * * Write
+ * * Wait for respond
+ * * Expected (DriveMode, gas_percentage)
+ */
 const std::string CHARACTERISTIC_UUID_DRIVE_MODES{"10b47dee-89d8-11ed-a1eb-0242ac120002"};
 
 /**
@@ -39,8 +45,8 @@ enum DriveMode
     ForwardCollision,
     Backward,
     BackwardCollision,
-    Stop
-
+    Stop,
+    Unsupported
 };
 
 /**
