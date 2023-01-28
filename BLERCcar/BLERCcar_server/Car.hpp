@@ -11,8 +11,8 @@ namespace car
     class Car : public Icontroller
     {
     private:
-        DriveMode m_mode;
-        Motor driveShaft, steering;
+        DriveMode m_Mode;
+        Motor m_DriveShaft, m_Steering;
         bool initMotors();
         void stop(bool zero_steer);
         void moveForward();
@@ -27,8 +27,8 @@ namespace car
         void SetSpeed(const char speed) override;
         void SetSpeed(const DriveMode &mode, const char speed) override{};
         void SetDriveMode(DriveMode mode) override;
-        const DriveMode CurrentDriveMode() override { return m_mode; };
-        const std::string CurrentDriveModeStr() override { return mode_to_str(m_mode); };
+        const DriveMode CurrentDriveMode() override { return m_Mode; };
+        const std::string CurrentDriveModeStr() override { return mode_to_str(m_Mode); };
     };
 } // Car
 
@@ -47,10 +47,10 @@ bool car::Car::initMotors()
 {
 
     // Motor A
-    driveShaft = Motor(0, 2, 15, 0);
+    m_DriveShaft = Motor(0, 2, 15, 0);
     Serial.println("driveShaft initialized");
     // Motor B
-    steering = Motor(16, 4, 17, 1);
+    m_Steering = Motor(16, 4, 17, 1);
     Serial.println("steering initialized");
     return true;
 };
@@ -62,13 +62,13 @@ bool car::Car::initMotors()
  */
 void car::Car::SetSpeed(const char speed)
 {
-    if (m_mode == Stop)
+    if (m_Mode == Stop)
     {
         Serial.print("Car is stopped, cant increase speed");
         return;
     }
     // Move DC motor forward with increasing speed
-    driveShaft.SetSpeed(speed);
+    m_DriveShaft.SetSpeed(speed);
 }
 
 /**
@@ -80,8 +80,8 @@ void car::Car::stop(bool zero_steer = false)
 {
     // Stop the DC motor
     Serial.println("Stopping driveShaft");
-    digitalWrite(driveShaft.Pin1, LOW);
-    digitalWrite(driveShaft.Pin2, LOW);
+    digitalWrite(m_DriveShaft.Pin1, LOW);
+    digitalWrite(m_DriveShaft.Pin2, LOW);
     if (zero_steer)
         zeroSteer();
 }
@@ -89,25 +89,25 @@ void car::Car::stop(bool zero_steer = false)
 void car::Car::moveForward()
 {
     Serial.println(__PRETTY_FUNCTION__);
-    Serial.printf("Moving Forward at [%d]%%\n", driveShaft.CurrentSpeedPercentage());
-    Serial.printf("Writing Pin1[%d] = LOW\n", driveShaft.Pin1);
-    Serial.printf("Writing Pin2[%d] = HIGH\n", driveShaft.Pin2);
-    digitalWrite(driveShaft.Pin1, LOW);
-    digitalWrite(driveShaft.Pin2, HIGH);
+    Serial.printf("Moving Forward at [%d]%%\n", m_DriveShaft.CurrentSpeedPercentage());
+    Serial.printf("Writing Pin1[%d] = LOW\n", m_DriveShaft.Pin1);
+    Serial.printf("Writing Pin2[%d] = HIGH\n", m_DriveShaft.Pin2);
+    digitalWrite(m_DriveShaft.Pin1, LOW);
+    digitalWrite(m_DriveShaft.Pin2, HIGH);
 }
 
 void car::Car::moveBackward()
 {
-    Serial.printf("Moving Backward at [%d]%\n", driveShaft.CurrentSpeedPercentage());
-    digitalWrite(driveShaft.Pin1, HIGH);
-    digitalWrite(driveShaft.Pin2, LOW);
+    Serial.printf("Moving Backward at [%d]%\n", m_DriveShaft.CurrentSpeedPercentage());
+    digitalWrite(m_DriveShaft.Pin1, HIGH);
+    digitalWrite(m_DriveShaft.Pin2, LOW);
     delay(2000);
 }
 
 void car::Car::zeroSteer()
 {
-    digitalWrite(steering.Pin1, LOW);
-    digitalWrite(steering.Pin2, LOW);
+    digitalWrite(m_Steering.Pin1, LOW);
+    digitalWrite(m_Steering.Pin2, LOW);
 }
 
 void car::Car::TurnLeft(const char percentage)
@@ -115,57 +115,57 @@ void car::Car::TurnLeft(const char percentage)
     if (percentage == 0)
         zeroSteer();
     Serial.println(__PRETTY_FUNCTION__);
-    steering.SetSpeed(percentage);
-    Serial.printf("TurnLeft [%d]%%\n", steering.CurrentSpeedPercentage());
-    Serial.printf("Writing Pin1[%d] = HIGH\n", steering.Pin1);
-    Serial.printf("Writing Pin2[%d] = LOW\n", steering.Pin2);
-    digitalWrite(steering.Pin1, HIGH);
-    digitalWrite(steering.Pin2, LOW);
+    m_Steering.SetSpeed(percentage);
+    Serial.printf("TurnLeft [%d]%%\n", m_Steering.CurrentSpeedPercentage());
+    Serial.printf("Writing Pin1[%d] = HIGH\n", m_Steering.Pin1);
+    Serial.printf("Writing Pin2[%d] = LOW\n", m_Steering.Pin2);
+    digitalWrite(m_Steering.Pin1, HIGH);
+    digitalWrite(m_Steering.Pin2, LOW);
 }
 void car::Car::TurnRight(const char percentage)
 {
     if (percentage == 0)
         zeroSteer();
     Serial.println(__PRETTY_FUNCTION__);
-    steering.SetSpeed(percentage);
-    Serial.printf("TurnRight [%d]%%\n", steering.CurrentSpeedPercentage());
-    Serial.printf("Writing Pin1[%d] = LOW\n", steering.Pin1);
-    Serial.printf("Writing Pin2[%d] = HIGH\n", steering.Pin2);
-    digitalWrite(steering.Pin1, LOW);
-    digitalWrite(steering.Pin2, HIGH);
+    m_Steering.SetSpeed(percentage);
+    Serial.printf("TurnRight [%d]%%\n", m_Steering.CurrentSpeedPercentage());
+    Serial.printf("Writing Pin1[%d] = LOW\n", m_Steering.Pin1);
+    Serial.printf("Writing Pin2[%d] = HIGH\n", m_Steering.Pin2);
+    digitalWrite(m_Steering.Pin1, LOW);
+    digitalWrite(m_Steering.Pin2, HIGH);
 }
 
 void car::Car::SetDriveMode(DriveMode mode)
 {
     Serial.println(__PRETTY_FUNCTION__);
-    if (mode != m_mode)
+    if (mode != m_Mode)
     {
 
         switch (mode)
         {
         case Forward:
-            m_mode = mode;
+            m_Mode = mode;
             moveForward();
             break;
         case Backward:
-            m_mode = mode;
+            m_Mode = mode;
             moveBackward();
             break;
         case Stop:
-            m_mode = mode;
+            m_Mode = mode;
             stop(true);
             break;
         default:
-            m_mode = DriveMode::Stop;
+            m_Mode = DriveMode::Stop;
             Serial.print("Called with unsupported mode, setting Stop");
             break;
         }
         Serial.print("Setting DriveMode: ");
-        Serial.println(mode_to_str(m_mode).c_str());
+        Serial.println(mode_to_str(m_Mode).c_str());
         return;
     }
 
-    Serial.printf("Called with mode: %s. But mode is already: %s\n", mode_to_str(mode).c_str(), mode_to_str(m_mode).c_str());
+    Serial.printf("Called with mode: %s. But mode is already: %s\n", mode_to_str(mode).c_str(), mode_to_str(m_Mode).c_str());
 };
 
 #endif // CAR
