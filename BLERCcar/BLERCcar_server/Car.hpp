@@ -18,6 +18,7 @@ namespace car
         void moveForward();
         void moveBackward();
         void zeroSteer();
+        environment_sensing::DistanceSensor *m_LeftDistanceSensor, *m_RightDistanceSensor;
 
     public:
         Car();
@@ -29,6 +30,15 @@ namespace car
         void SetDriveMode(DriveMode mode) override;
         const DriveMode CurrentDriveMode() override { return m_Mode; };
         const std::string CurrentDriveModeStr() override { return mode_to_str(m_Mode); };
+
+        /**
+         * @brief Get current Distance Measurements.
+         * @note Unless there will be a User for this measurements on the Server side, than it's implementation is redundant.
+         * @note Expected user wil  be BLEManager
+         *
+         * @return const environment_sensing::DistanceMeasurements
+         */
+        const environment_sensing::DistanceMeasurements GetDistanceMeasurements() const override;
     };
 } // Car
 
@@ -38,6 +48,8 @@ car::Car::Car()
     if (initMotors())
     {
         Serial.println("Car is initialized");
+        m_LeftDistanceSensor = new environment_sensing::DistanceSensor("Left", 36, 39);
+        // m_RightDistanceSensor = new DistanceSensor();
         return;
     }
     Serial.println("Failed to initialize");
@@ -168,4 +180,17 @@ void car::Car::SetDriveMode(DriveMode mode)
     Serial.printf("Called with mode: %s. But mode is already: %s\n", mode_to_str(mode).c_str(), mode_to_str(m_Mode).c_str());
 };
 
+const environment_sensing::DistanceMeasurements car::Car::GetDistanceMeasurements() const
+{
+    environment_sensing::DistanceMeasurements d;
+    if (m_LeftDistanceSensor)
+    {
+        d.FrontLeft = m_LeftDistanceSensor->GetCurrentDistanceInCm();
+    }
+    if (m_RightDistanceSensor)
+    {
+        d.FrontRight = m_RightDistanceSensor->GetCurrentDistanceInCm();
+    }
+    return d;
+};
 #endif // CAR

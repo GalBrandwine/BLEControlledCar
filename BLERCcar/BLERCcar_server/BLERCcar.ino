@@ -6,6 +6,7 @@
 car::Car *my_car;
 ble::BLEManager *ble_mgr;
 bool oldDeviceConnected = false;
+
 void setup()
 {
 
@@ -19,64 +20,34 @@ void setup()
 
 void loop()
 {
+  // // Clears the trigPin
+  // digitalWrite(trigPin, LOW);
+  // delayMicroseconds(2);
+  // // Sets the trigPin on HIGH state for 10 micro seconds
+  // digitalWrite(trigPin, HIGH);
+  // delayMicroseconds(10);
+  // digitalWrite(trigPin, LOW);
+  // // Reads the echoPin, returns the sound wave travel time in microseconds
+  // duration = pulseIn(echoPin, HIGH);
+  // // Calculate the distance
+  // distanceCm = duration * SOUND_SPEED / 2.0f;
+
+  // // Convert to inches
+  // distanceInch = distanceCm * CM_TO_INCH;
+
+  // Prints the distance in the Serial Monitor
+  // Serial.print("Distance (cm): ");
+  // Serial.println(distanceCm);
+  // Serial.print("Distance (inch): ");
+  // Serial.println(distanceInch);
+
+  // delay(1000);
 
   if (ble_mgr->GetContext().IsDeviceConnected)
   {
-    // if (play_once)
-    // {
-    //   play_once = false;
-    //   digitalWrite(LED_PIN, HIGH); // turn the LED on
-    //   my_car->SetDriveMode(car::DriveMode::Forward);
-    //   delay(2000);
-    //   my_car->SetSpeed(80);
-    //   delay(2000);
-    //   my_car->SetSpeed(100);
-    //   delay(2000);
-    //   my_car->SetSpeed(50);
-    //   delay(2000);
-    //   my_car->SetDriveMode(car::DriveMode::Backward);
-    //   my_car->SetSpeed(100);
-    //   delay(2000);
-    //   my_car->SetDriveMode(car::DriveMode::Stop);
-    //   delay(2000);
-
-    //   // Check steering accuracy
-    //   my_car->TurnLeft(100);
-    //   delay(2000);
-    //   my_car->TurnLeft(0); // Zeroing
-    //   delay(2000);
-    //   my_car->TurnLeft(25);
-    //   delay(2000);
-    //   my_car->TurnLeft(50);
-    //   delay(2000);
-    //   my_car->TurnLeft(75);
-    //   delay(2000);
-    //   my_car->TurnLeft(100);
-    //   delay(2000);
-    //   my_car->TurnLeft(0); // Zeroing
-    //   delay(2000);
-    //   my_car->TurnRight(100);
-    //   delay(2000);
-    //   my_car->TurnRight(0); // Zeroing
-    //   delay(2000);
-    //   my_car->TurnRight(25);
-    //   delay(2000);
-    //   my_car->TurnRight(50);
-    //   delay(2000);
-    //   my_car->TurnRight(75);
-    //   delay(2000);
-    //   my_car->TurnRight(100);
-    //   delay(2000);
-    //   my_car->TurnRight(0); // Zeroing
-    //   delay(2000);
-    // }
-
-    // // Serial.println("Device connected, setting value in TX");
-    // pTxCharacteristic->setValue(&txValue, 1);
-    // pTxCharacteristic->notify();
-    // txValue++;
-    // Serial.println("Chilling, not burning bluetooth stack");
-    delay(10); // bluetooth stack will go into congestion, if too many packets are sent
+    auto distance_measurements = my_car->GetDistanceMeasurements();
+    Serial.printf("FrontLeft: %d\FrontRight: %d", distance_measurements.FrontLeft, distance_measurements.FrontRight);
+    delay(100); // bluetooth stack will go into congestion, if too many packets are sent
   }
 
   // disconnecting
