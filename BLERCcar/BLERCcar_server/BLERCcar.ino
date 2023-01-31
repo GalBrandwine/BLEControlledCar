@@ -43,10 +43,17 @@ void loop()
 
   // delay(1000);
 
+  /**
+   * @brief When connected, sample distance in 100hz
+   *
+   */
   if (ble_mgr->GetContext().IsDeviceConnected)
   {
-    auto distance_measurements = my_car->GetDistanceMeasurements();
-    Serial.printf("FrontLeft: %d\FrontRight: %d", distance_measurements.FrontLeft, distance_measurements.FrontRight);
+    // auto distance_measurements = my_car->GetDistanceMeasurements();
+    // Serial.print("FrontLeft: ");
+    // Serial.println(distance_measurements.FrontLeft);
+    // Serial.print("FrontRight: ");
+    // Serial.println(distance_measurements.FrontRight);
     delay(100); // bluetooth stack will go into congestion, if too many packets are sent
   }
 

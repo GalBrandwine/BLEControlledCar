@@ -18,7 +18,7 @@ namespace car
         void moveForward();
         void moveBackward();
         void zeroSteer();
-        environment_sensing::DistanceSensor *m_LeftDistanceSensor, *m_RightDistanceSensor;
+        environment_sensing::DistanceSensor *m_LeftDistanceSensor{NULL}, *m_RightDistanceSensor{NULL};
 
     public:
         Car();
@@ -185,10 +185,12 @@ const environment_sensing::DistanceMeasurements car::Car::GetDistanceMeasurement
     environment_sensing::DistanceMeasurements d;
     if (m_LeftDistanceSensor)
     {
+        Serial.println("Sampling Left distance sensor");
         d.FrontLeft = m_LeftDistanceSensor->GetCurrentDistanceInCm();
     }
     if (m_RightDistanceSensor)
     {
+        Serial.println("Sampling Right distance sensor");
         d.FrontRight = m_RightDistanceSensor->GetCurrentDistanceInCm();
     }
     return d;

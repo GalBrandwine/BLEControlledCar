@@ -9,7 +9,7 @@ namespace environment_sensing
 {
     struct DistanceMeasurements
     {
-        long FrontLeft{0}, FrontRight{0};
+        double FrontLeft{0}, FrontRight{0};
     };
 
     class DistanceSensor
@@ -37,8 +37,11 @@ namespace environment_sensing
           m_TrigPin(TrigPin),
           m_EchoPin(EchoPin)
     {
-        Serial.printf("Distance sensor %s initializing...\n", m_TaskName.c_str());
-        Serial.printf("TrigPin: %d\nEchoPin: %s", m_TrigPin, m_EchoPin);
+        Serial.print("Distance sensor "); 
+        Serial.print(m_TaskName);
+        Serial.println("initializing...");
+        Serial.print("TrigPin: ");Serial.println(m_TrigPin);
+        Serial.print("EchoPin: ");Serial.println(m_EchoPin);
         pinMode(m_TrigPin, OUTPUT); // Sets the trigPin as an Output
         pinMode(m_EchoPin, INPUT);  // Sets the echoPin as an Input
         Serial.println("Distance sensor pins are set...");
@@ -51,10 +54,12 @@ namespace environment_sensing
      */
     const unsigned long DistanceSensor::GetCurrentDistanceInCm()
     {
-        // Serial.println(__PRETTY_FUNCTION__);
+        Serial.print(m_TaskName.c_str());
+        Serial.println(" sensor getting measurement...");
         // Clears the trigPin
         digitalWrite(m_TrigPin, LOW);
         delayMicroseconds(2);
+
         // Sets the trigPin on HIGH state for 10 micro seconds
         digitalWrite(m_TrigPin, HIGH);
         delayMicroseconds(10);

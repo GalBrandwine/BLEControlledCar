@@ -16,13 +16,14 @@ namespace ble
         MyServerCallbacks *m_pServerCallbacks{NULL};
         MyCharCallbacks *m_pMyCharCallbacks{NULL};
         BLEServer *m_pServer{NULL};
-        BLECharacteristic *m_pTxCharacteristic{NULL};
+        BLECharacteristic *m_pFrontLeftDistanceCharacteristic{NULL};
         Context m_BLEManager_ctx;
 
     public:
         const Context &GetContext() const { return m_BLEManager_ctx; };
         BLEManager(Icontroller *controller);
         void Advertise();
+        void NotifyNewDistanceRead(environment_sensing::DistanceMeasurements &distanceMeasurements);
         ~BLEManager();
     };
 
@@ -66,6 +67,16 @@ namespace ble
                 // Serial.println(__PRETTY_FUNCTION__);
                 // Serial.printf("Device connected LED: %d\n", led);
                 digitalWrite(led, HIGH); // turn the LED on
+                /**
+                 * @brief Send distance measurements in 100hz
+                 *
+                 */
+                while ((pBLEManager->GetContext()).IsDeviceConnected)
+                {
+                    auto distanceMeasurements = pBLEManager->GetContext().Controller->GetDistanceMeasurements();
+                    pBLEManager->NotifyNewDistanceRead(distanceMeasurements);
+                    vTaskDelay(100 / portTICK_PERIOD_MS);
+                }
             }
             /**
              * @brief Blink while waiting for connection
@@ -100,6 +111,13 @@ namespace ble
 
 } // ble
 
+void ble::BLEManager::NotifyNewDistanceRead(environment_sensing::DistanceMeasurements &distanceMeasurements)
+{
+    Serial.println(__PRETTY_FUNCTION__);
+    m_pFrontLeftDistanceCharacteristic->setValue(distanceMeasurements.FrontLeft);
+    m_pFrontLeftDistanceCharacteristic->notify();
+};
+
 void ble::BLEManager::Advertise()
 {
     m_pServer->startAdvertising();
@@ -126,11 +144,11 @@ ble::BLEManager::BLEManager(Icontroller *controller)
 
     // Create a BLE Characteristic
     // Ill use this characteristic to sent data back to the client
-    // m_pTxCharacteristic = pService->createCharacteristic(
-    //     CHARACTERISTIC_UUID_,
-    //     BLECharacteristic::PROPERTY_NOTIFY); // See NOTIFY and other properties - https://embeddedcentric.com/lesson-2-ble-profiles-services-characteristics-device-roles-and-network-topology/
+    m_pFrontLeftDistanceCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_UUID_FRONT_LEFT_DISTANCE_CM,
+        BLECharacteristic::PROPERTY_NOTIFY); // See NOTIFY and other properties - https://embeddedcentric.com/lesson-2-ble-profiles-services-characteristics-device-roles-and-network-topology/
 
-    // m_pTxCharacteristic->addDescriptor(new BLE2902());
+    m_pFrontLeftDistanceCharacteristic->addDescriptor(new BLE2902());
 
     BLECharacteristic *pReceiveDriveModeCharacteristic = pService->createCharacteristic(
         CHARACTERISTIC_UUID_DRIVE_MODES,

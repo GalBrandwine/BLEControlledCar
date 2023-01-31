@@ -17,12 +17,19 @@
  * * Write
  * * Wait fro respond
  * * Expected (Direction, steer_percentage)
+ * Characteristic front left distance cm UUID: () 10b482e4-89d8-11ed-a1eb-0242ac120002
+ * * Notify
  * Unused
- * * 10b482e4-89d8-11ed-a1eb-0242ac120002
  * * 10b48410-89d8-11ed-a1eb-0242ac120002
  */
 
 const std::string CAR_BLE_SERVICE_UUID{"10b47b82-89d8-11ed-a1eb-0242ac120002"};
+
+/**
+ * @brief Characteristic front left distance cm UUID: () 10b482e4-89d8-11ed-a1eb-0242ac120002
+ * * Notify
+ */
+const std::string CHARACTERISTIC_UUID_FRONT_LEFT_DISTANCE_CM{"10b482e4-89d8-11ed-a1eb-0242ac120002"};
 
 /**
  * @brief Characteristic Drive mode UUID: (CHARACTERISTIC_UUID_DRIVE_MODES) 10b47dee-89d8-11ed-a1eb-0242ac120002
@@ -40,6 +47,11 @@ const std::string CHARACTERISTIC_UUID_DRIVE_MODES{"10b47dee-89d8-11ed-a1eb-0242a
  */
 const std::string CHARACTERISTIC_UUID_STEERING{"10b481ae-89d8-11ed-a1eb-0242ac120002"};
 
+enum SensorReadType
+{
+    FrontLeft,
+    FrontRight,
+};
 enum DriveMode
 {
     Forward,
