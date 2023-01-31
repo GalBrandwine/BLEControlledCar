@@ -1,16 +1,8 @@
 #ifndef DISTANCE_SENSOR
 #define DISTANCE_SENSOR
 
-// define sound speed in cm/uS
-#define SOUND_SPEED 0.034
-#define CM_TO_INCH 0.393701
-
 namespace environment_sensing
 {
-    struct DistanceMeasurements
-    {
-        double FrontLeft{0}, FrontRight{0};
-    };
 
     class DistanceSensor
     {
@@ -37,11 +29,13 @@ namespace environment_sensing
           m_TrigPin(TrigPin),
           m_EchoPin(EchoPin)
     {
-        Serial.print("Distance sensor "); 
+        Serial.print("Distance sensor ");
         Serial.print(m_TaskName);
         Serial.println("initializing...");
-        Serial.print("TrigPin: ");Serial.println(m_TrigPin);
-        Serial.print("EchoPin: ");Serial.println(m_EchoPin);
+        Serial.print("TrigPin: ");
+        Serial.println(m_TrigPin);
+        Serial.print("EchoPin: ");
+        Serial.println(m_EchoPin);
         pinMode(m_TrigPin, OUTPUT); // Sets the trigPin as an Output
         pinMode(m_EchoPin, INPUT);  // Sets the echoPin as an Input
         Serial.println("Distance sensor pins are set...");

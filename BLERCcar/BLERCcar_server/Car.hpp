@@ -4,7 +4,7 @@
 #include "/home/gal/dev/BLEControlledCar/BLERCcar/common/common.hpp"
 #include "/home/gal/dev/BLEControlledCar/BLERCcar/common/Icontroller.hpp"
 #include "Motor.hpp"
-
+#include "DistanceSensor.hpp"
 namespace car
 {
 

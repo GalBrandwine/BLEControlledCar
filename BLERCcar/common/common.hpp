@@ -1,7 +1,7 @@
 #ifndef COMMON
 #define COMMON
 #include <iostream>
-#include "DistanceSensor.hpp"
+#include "DistanceSensor_data.hpp"
 
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
@@ -47,11 +47,7 @@ const std::string CHARACTERISTIC_UUID_DRIVE_MODES{"10b47dee-89d8-11ed-a1eb-0242a
  */
 const std::string CHARACTERISTIC_UUID_STEERING{"10b481ae-89d8-11ed-a1eb-0242ac120002"};
 
-enum SensorReadType
-{
-    FrontLeft,
-    FrontRight,
-};
+
 enum DriveMode
 {
     Forward,
