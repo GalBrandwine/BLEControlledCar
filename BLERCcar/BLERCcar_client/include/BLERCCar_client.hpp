@@ -41,11 +41,15 @@ private:
     std::vector<std::shared_ptr<SimpleBluez::Device>> m_Peripherals; // BLE related
     std::unordered_map<std::string, std::pair<std::shared_ptr<SimpleBluez::Service>, std::shared_ptr<SimpleBluez::Characteristic>>>
         m_CharMap;
+    environment_sensing::DistanceMeasurements m_DistanceMeasurements;
+    DriveMode m_DriveMode{DriveMode::Unsupported};
     /**
      * @brief The BLE peripheral object represent the Car BLE service
      *
      */
     std::shared_ptr<SimpleBluez::Device> m_Peripheral;
+    void attachNewDriveModeCallback();
+    void attachDistanceMeasurementsCallback();
     void mapCharacteristics();
     void disconnect();
 
@@ -73,6 +77,7 @@ public:
     void SetSpeed(const char speed) override{};
     void SetSpeed(const DriveMode &mode, const char speed) override;
     void SetDriveMode(DriveMode mode) override;
-    const DriveMode CurrentDriveMode() override { return DriveMode::Stop; };
-    const std::string CurrentDriveModeStr() override { return mode_to_str((DriveMode)99); };
+    const DriveMode CurrentDriveMode() override { return m_DriveMode; };
+    const std::string CurrentDriveModeStr() override { return mode_to_str(m_DriveMode); };
+    const environment_sensing::DistanceMeasurements GetDistanceMeasurements() const { return m_DistanceMeasurements; };
 };

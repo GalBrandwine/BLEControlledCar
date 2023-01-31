@@ -14,7 +14,7 @@ public:
     BLERCCarPacket(const char command, const char amount) : m_Command{command}, m_Amount{amount}, raw{m_Command, m_Amount} {};
     ~BLERCCarPacket(){};
 
-    const char *GetPayload()
+    const char *GetPayload() const
     {
         return raw;
     };
@@ -69,7 +69,7 @@ public:
      *
      * @return const DriveMode
      */
-    const DriveMode GetDriveMode()
+    const DriveMode GetDriveMode() const
     {
         auto raw_drive_mode = (DriveMode)m_Command;
 
@@ -84,8 +84,9 @@ public:
         case DriveMode::BackwardCollision:
             return DriveMode::BackwardCollision;
         default:
-            break;
+            return DriveMode::Unsupported;
         }
+        return DriveMode::Unsupported;
     };
 
     BLEDrivePacket() = delete;

@@ -11,7 +11,7 @@ namespace car
     class Car : public Icontroller
     {
     private:
-        DriveMode m_Mode;
+        DriveMode m_Mode{DriveMode::Stop};
         Motor m_DriveShaft, m_Steering;
         bool initMotors();
         void stop(bool zero_steer);

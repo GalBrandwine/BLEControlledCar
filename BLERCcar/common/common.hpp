@@ -8,45 +8,62 @@
 
 /**
  * @brief Bulk of my own UUID's
- * Car service UUID: 10b47b82-89d8-11ed-a1eb-0242ac120002
- * Characteristic Drive mode UUID: (CHARACTERISTIC_UUID_DRIVE_MODES) 10b47dee-89d8-11ed-a1eb-0242ac120002
+ * Car service UUID: 2c6702d8-a1b0-11ed-a8fc-0242ac120002
+ * Characteristic Drive mode UUID: (CHARACTERISTIC_UUID_DRIVE_MODES) 2c670756-a1b0-11ed-a8fc-0242ac120002
  * * Write
  * * Wait-for-respond
  * * Expected (Driving mode, accel amount)
- * Characteristic Steering UUID: () 10b481ae-89d8-11ed-a1eb-0242ac120002
+ * Characteristic Steering UUID: () 2c6708d2-a1b0-11ed-a8fc-0242ac120002
  * * Write
  * * Wait fro respond
  * * Expected (Direction, steer_percentage)
- * Characteristic front left distance cm UUID: () 10b482e4-89d8-11ed-a1eb-0242ac120002
+ * Characteristic front left distance cm UUID: () 2c670594-a1b0-11ed-a8fc-0242ac120002
+ * * Notify
+ * Characteristic front right distance cm UUID: () 2c670a12-a1b0-11ed-a8fc-0242ac120002
  * * Notify
  * Unused
- * * 10b48410-89d8-11ed-a1eb-0242ac120002
+ * *
+ * * 2c670c60-a1b0-11ed-a8fc-0242ac120002
+ * * 2c670d82-a1b0-11ed-a8fc-0242ac120002
+ * * 2c67119c-a1b0-11ed-a8fc-0242ac120002
+ * * 2c6712d2-a1b0-11ed-a8fc-0242ac120002
  */
 
-const std::string CAR_BLE_SERVICE_UUID{"10b47b82-89d8-11ed-a1eb-0242ac120002"};
+const std::string CAR_BLE_SERVICE_UUID{"2c6702d8-a1b0-11ed-a8fc-0242ac120002"};
 
 /**
- * @brief Characteristic front left distance cm UUID: () 10b482e4-89d8-11ed-a1eb-0242ac120002
+ * @brief Characteristic front right distance cm UUID: () 2c670a12-a1b0-11ed-a8fc-0242ac120002
  * * Notify
  */
-const std::string CHARACTERISTIC_UUID_FRONT_LEFT_DISTANCE_CM{"10b482e4-89d8-11ed-a1eb-0242ac120002"};
+const std::string CHARACTERISTIC_UUID_FRONT_RIGHT_DISTANCE_CM{"2c670a12-a1b0-11ed-a8fc-0242ac120002"};
 
 /**
- * @brief Characteristic Drive mode UUID: (CHARACTERISTIC_UUID_DRIVE_MODES) 10b47dee-89d8-11ed-a1eb-0242ac120002
+ * @brief Characteristic front left distance cm UUID: () 2c670594-a1b0-11ed-a8fc-0242ac120002
+ * * Notify
+ */
+const std::string CHARACTERISTIC_UUID_FRONT_LEFT_DISTANCE_CM{"2c670594-a1b0-11ed-a8fc-0242ac120002"};
+
+/**
+ * @brief Characteristic Drive mode UUID: (CHARACTERISTIC_UUID_DRIVE_MODES) 2c670756-a1b0-11ed-a8fc-0242ac120002
  * * Write
  * * Wait for respond
  * * Expected (DriveMode, gas_percentage)
  */
-const std::string CHARACTERISTIC_UUID_DRIVE_MODES{"10b47dee-89d8-11ed-a1eb-0242ac120002"};
+const std::string CHARACTERISTIC_UUID_SET_DRIVE_MODES{"2c670756-a1b0-11ed-a8fc-0242ac120002"};
 
 /**
- * @brief Characteristic Steering UUID: () 10b481ae-89d8-11ed-a1eb-0242ac120002
+ * @brief Characteristic Drive mode UUID: (CHARACTERISTIC_UUID_GET_DRIVE_MODES) 2c670b48-a1b0-11ed-a8fc-0242ac120002
+ * * Notify
+ */
+const std::string CHARACTERISTIC_UUID_CURRENT_DRIVE{"2c670b48-a1b0-11ed-a8fc-0242ac120002"};
+
+/**
+ * @brief Characteristic Steering UUID: () 2c6708d2-a1b0-11ed-a8fc-0242ac120002
  * * Write
  * * Wait for respond
  * * Expected (Direction, steer_percentage)
  */
-const std::string CHARACTERISTIC_UUID_STEERING{"10b481ae-89d8-11ed-a1eb-0242ac120002"};
-
+const std::string CHARACTERISTIC_UUID_STEERING{"2c6708d2-a1b0-11ed-a8fc-0242ac120002"};
 
 enum DriveMode
 {
@@ -79,7 +96,7 @@ static const std::string mode_to_str(DriveMode mode)
     case Stop:
         return "Stop";
     default:
-        return "NotSupported";
+        return "Unsupported";
     }
 }
 

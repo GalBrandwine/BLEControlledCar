@@ -50,19 +50,19 @@ namespace ble
         {
             Serial.println("Got onRead callback");
             Serial.println(pCharacteristic->getUUID().toString().c_str());
-            if (pCharacteristic->getUUID().toString() == CHARACTERISTIC_UUID_DRIVE_MODES)
+            if (pCharacteristic->getUUID().toString() == CHARACTERISTIC_UUID_SET_DRIVE_MODES)
             {
                 auto raw = (char *)(pCharacteristic->getData());
                 if (!raw)
                 {
-                    Serial.println("[warn][CHARACTERISTIC_UUID_DRIVE_MODES] onRead callback triggered with no data!!!");
+                    Serial.println("[warn][CHARACTERISTIC_UUID_SET_DRIVE_MODES] onRead callback triggered with no data!!!");
                     return;
                 }
 
                 BLEDrivePacket packet{raw};
                 if (packet.GetDriveMode() == DriveMode::Unsupported)
                 {
-                    Serial.printf("[warn][CHARACTERISTIC_UUID_DRIVE_MODES] onRead callback triggered with UNSUPPORTED DRIVEMODE: %d !!!\n", raw[0]);
+                    Serial.printf("[warn][CHARACTERISTIC_UUID_SET_DRIVE_MODES] onRead callback triggered with UNSUPPORTED DRIVEMODE: %d !!!\n", raw[0]);
                     return;
                 }
                 Serial.printf("Got drive mode: %s [raw: %d]\nWith amount: %d\n", mode_to_str(packet.GetDriveMode()).c_str(), raw[0], packet.GetAmount());

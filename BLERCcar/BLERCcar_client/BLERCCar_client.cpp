@@ -131,7 +131,32 @@ bool BLERCCar_client::Connect(const std::string &server)
     }
     initRssiReadThread();
     mapCharacteristics();
+    attachDistanceMeasurementsCallback();
+    attachNewDriveModeCallback();
     return true;
+}
+
+void BLERCCar_client::attachNewDriveModeCallback()
+{
+    auto drive_modes_characteristic = m_CharMap[CHARACTERISTIC_UUID_CURRENT_DRIVE].second;
+    drive_modes_characteristic->set_on_value_changed([&](SimpleBluez::ByteArray driveMode)
+                                                     {
+                                                         BLEDrivePacket p{driveMode.c_str()};
+                                                         m_DriveMode = p.GetDriveMode();
+                                                         // memcpy(&m_DistanceMeasurements.FrontLeft, leftSensorReadings.c_str(), sizeof(double));
+                                                         spdlog::debug("New DriveMode received: {}",mode_to_str( p.GetDriveMode())); });
+    drive_modes_characteristic->start_notify();
+}
+
+void BLERCCar_client::attachDistanceMeasurementsCallback()
+{
+    auto front_left_distance_reading_characteristic = m_CharMap[CHARACTERISTIC_UUID_FRONT_LEFT_DISTANCE_CM].second;
+    front_left_distance_reading_characteristic->set_on_value_changed([&](SimpleBluez::ByteArray leftSensorReadings)
+                                                                     {
+                                                                         memcpy(&m_DistanceMeasurements.FrontLeft, leftSensorReadings.c_str(), sizeof(double));
+                                                                         //  spdlog::debug("leftSensorReadings: {}", m_DistanceMeasurements.FrontLeft);
+                                                                     });
+    front_left_distance_reading_characteristic->start_notify();
 }
 
 void BLERCCar_client::initRssiReadThread()
@@ -192,7 +217,7 @@ void BLERCCar_client::TurnRight(const char percentage)
 void BLERCCar_client::SetDriveMode(DriveMode mode)
 {
     spdlog::debug("Start {}", __PRETTY_FUNCTION__);
-    auto characteristic = m_CharMap[CHARACTERISTIC_UUID_DRIVE_MODES].second;
+    auto characteristic = m_CharMap[CHARACTERISTIC_UUID_SET_DRIVE_MODES].second;
     BLEDrivePacket packet{mode, 0};
     characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
     // auto got = characteristic->read();
@@ -202,7 +227,7 @@ void BLERCCar_client::SetDriveMode(DriveMode mode)
 void BLERCCar_client::SetSpeed(const DriveMode &mode, const char speed)
 {
     spdlog::debug("Start {}", __PRETTY_FUNCTION__);
-    auto characteristic = m_CharMap[CHARACTERISTIC_UUID_DRIVE_MODES].second;
+    auto characteristic = m_CharMap[CHARACTERISTIC_UUID_SET_DRIVE_MODES].second;
 
     // Do we care about Current DriveMode?
     // auto got = characteristic->read();

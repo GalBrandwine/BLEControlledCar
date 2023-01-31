@@ -16,7 +16,10 @@ namespace ble
         MyServerCallbacks *m_pServerCallbacks{NULL};
         MyCharCallbacks *m_pMyCharCallbacks{NULL};
         BLEServer *m_pServer{NULL};
-        BLECharacteristic *m_pFrontLeftDistanceCharacteristic{NULL};
+        BLECharacteristic *m_pFrontLeftDistanceCharacteristic{NULL},
+            *m_pReceiveDriveModeCharacteristic{NULL},
+            *m_pReceiveSteeringCharacteristic{NULL},
+            *m_pCurrentDriveModeCharacteristic{NULL};
         Context m_BLEManager_ctx;
 
     public:
@@ -24,6 +27,7 @@ namespace ble
         BLEManager(Icontroller *controller);
         void Advertise();
         void NotifyNewDistanceRead(environment_sensing::DistanceMeasurements &distanceMeasurements);
+        void NotifyNewDriveMode(const BLEDrivePacket &pkt);
         ~BLEManager();
     };
 
@@ -67,15 +71,32 @@ namespace ble
                 // Serial.println(__PRETTY_FUNCTION__);
                 // Serial.printf("Device connected LED: %d\n", led);
                 digitalWrite(led, HIGH); // turn the LED on
+                DriveMode current_drive_mode{DriveMode::Unsupported};
+
                 /**
-                 * @brief Send distance measurements in 100hz
+                 * @brief Send distance measurements in 10hz
                  *
                  */
+                // Block for 100ms.
+                const TickType_t xDelay = 100 / portTICK_PERIOD_MS;
                 while ((pBLEManager->GetContext()).IsDeviceConnected)
                 {
+                    auto tmp_drive_mode = pBLEManager->GetContext().Controller->CurrentDriveMode();
+                    if (current_drive_mode != tmp_drive_mode)
+                    {
+                        Serial.println("current_drive_mode != tmp_drive_mode");
+                        Serial.print("current_drive_mode");
+                        Serial.println(current_drive_mode);
+                        Serial.print("tmp_drive_mode");
+                        Serial.println(tmp_drive_mode);
+                        current_drive_mode = tmp_drive_mode;
+                        BLEDrivePacket p{current_drive_mode, 0};
+                        pBLEManager->NotifyNewDriveMode(p);
+                    }
+
                     auto distanceMeasurements = pBLEManager->GetContext().Controller->GetDistanceMeasurements();
                     pBLEManager->NotifyNewDistanceRead(distanceMeasurements);
-                    vTaskDelay(100 / portTICK_PERIOD_MS);
+                    vTaskDelay(xDelay);
                 }
             }
             /**
@@ -111,9 +132,20 @@ namespace ble
 
 } // ble
 
-void ble::BLEManager::NotifyNewDistanceRead(environment_sensing::DistanceMeasurements &distanceMeasurements)
+void ble::BLEManager::NotifyNewDriveMode(const BLEDrivePacket &pkt)
 {
     Serial.println(__PRETTY_FUNCTION__);
+    Serial.print("Setting DriveMode value: ");
+    Serial.println(mode_to_str(pkt.GetDriveMode()).c_str());
+    m_pCurrentDriveModeCharacteristic->setValue(pkt.GetPayload());
+    m_pCurrentDriveModeCharacteristic->notify();
+}
+
+void ble::BLEManager::NotifyNewDistanceRead(environment_sensing::DistanceMeasurements &distanceMeasurements)
+{
+    // Serial.println(__PRETTY_FUNCTION__);
+    // Serial.print("Setting FrontLeft value: ");
+    // Serial.println(distanceMeasurements.FrontLeft);
     m_pFrontLeftDistanceCharacteristic->setValue(distanceMeasurements.FrontLeft);
     m_pFrontLeftDistanceCharacteristic->notify();
 };
@@ -144,23 +176,26 @@ ble::BLEManager::BLEManager(Icontroller *controller)
 
     // Create a BLE Characteristic
     // Ill use this characteristic to sent data back to the client
+    m_pCurrentDriveModeCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_UUID_CURRENT_DRIVE,
+        BLECharacteristic::PROPERTY_NOTIFY);
     m_pFrontLeftDistanceCharacteristic = pService->createCharacteristic(
         CHARACTERISTIC_UUID_FRONT_LEFT_DISTANCE_CM,
         BLECharacteristic::PROPERTY_NOTIFY); // See NOTIFY and other properties - https://embeddedcentric.com/lesson-2-ble-profiles-services-characteristics-device-roles-and-network-topology/
 
     m_pFrontLeftDistanceCharacteristic->addDescriptor(new BLE2902());
 
-    BLECharacteristic *pReceiveDriveModeCharacteristic = pService->createCharacteristic(
-        CHARACTERISTIC_UUID_DRIVE_MODES,
+    m_pReceiveDriveModeCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_UUID_SET_DRIVE_MODES,
         BLECharacteristic::PROPERTY_WRITE);
 
-    pReceiveDriveModeCharacteristic->setCallbacks(m_pMyCharCallbacks);
+    m_pReceiveDriveModeCharacteristic->setCallbacks(m_pMyCharCallbacks);
 
-    BLECharacteristic *pReceiveSteeringCharacteristic = pService->createCharacteristic(
+    m_pReceiveSteeringCharacteristic = pService->createCharacteristic(
         CHARACTERISTIC_UUID_STEERING,
         BLECharacteristic::PROPERTY_WRITE);
 
-    pReceiveSteeringCharacteristic->setCallbacks(m_pMyCharCallbacks);
+    m_pReceiveSteeringCharacteristic->setCallbacks(m_pMyCharCallbacks);
 
     // Start the service
     pService->start();
@@ -171,6 +206,9 @@ ble::BLEManager::BLEManager(Icontroller *controller)
 
 ble::BLEManager::~BLEManager()
 {
+    delete m_pReceiveDriveModeCharacteristic;
+    delete m_pReceiveSteeringCharacteristic;
+    delete m_pFrontLeftDistanceCharacteristic;
     delete m_pMyCharCallbacks;
     delete m_pServerCallbacks;
     delete m_pServer;

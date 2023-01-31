@@ -7,20 +7,20 @@
 // No mocking here. So test result might Not be deterministic
 //
 //----------------------------------------------------------------
-
+const std::string SERVER_MAC{"E0:E2:E6:0C:4A:8A"};
+using namespace std::chrono_literals;
 TEST(TestBLERCcar, ConnectionTestOnly)
 {
-    auto server{"78:E3:6D:65:45:22"};
     BLERCCar_client car_client{};
-    ASSERT_TRUE(car_client.Connect(server));
+    ASSERT_TRUE(car_client.Connect(SERVER_MAC));
+    std::this_thread::sleep_for(500ms);
 }
 
 TEST(TestBLERCcar, MinimalFlow)
 {
-    auto server{"78:E3:6D:65:45:22"};
     BLERCCar_client car_client{};
 
-    ASSERT_TRUE(car_client.Connect(server));
+    ASSERT_TRUE(car_client.Connect(SERVER_MAC));
 
     car_client.TurnLeft(100);
 }
@@ -28,10 +28,9 @@ TEST(TestBLERCcar, MinimalFlow)
 TEST(TestBLERCcar, TurnLeftIncrementally)
 {
     using namespace std::chrono_literals;
-    auto server{"78:E3:6D:65:45:22"};
     BLERCCar_client car_client{};
 
-    ASSERT_TRUE(car_client.Connect(server));
+    ASSERT_TRUE(car_client.Connect(SERVER_MAC));
 
     int MAX{100};
     for (int i = 0; i < MAX; i += 5)
@@ -44,10 +43,9 @@ TEST(TestBLERCcar, TurnLeftIncrementally)
 TEST(TestBLERCcar, TurnRightIncrementally)
 {
     using namespace std::chrono_literals;
-    auto server{"78:E3:6D:65:45:22"};
     BLERCCar_client car_client{};
 
-    ASSERT_TRUE(car_client.Connect(server));
+    ASSERT_TRUE(car_client.Connect(SERVER_MAC));
 
     int MAX{100};
     for (int i = 0; i < MAX; i += 5)
@@ -60,28 +58,33 @@ TEST(TestBLERCcar, TurnRightIncrementally)
 TEST(TestBLERCcar, SetDriveModeForward)
 {
     using namespace std::chrono_literals;
-    auto server{"78:E3:6D:65:45:22"};
     BLERCCar_client car_client{};
 
-    ASSERT_TRUE(car_client.Connect(server));
+    ASSERT_TRUE(car_client.Connect(SERVER_MAC));
+    auto expected_drive_mode = DriveMode::Forward;
+    car_client.SetDriveMode(expected_drive_mode);
 
-    car_client.SetDriveMode(DriveMode::Forward);
+    std::this_thread::sleep_for(500ms);
+    ASSERT_EQ(car_client.CurrentDriveMode(), expected_drive_mode);
+    std::this_thread::sleep_for(500ms);
 }
 
 TEST(TestBLERCcar, SetSpeedBackwardInclemently)
 {
     using namespace std::chrono_literals;
-    auto server{"78:E3:6D:65:45:22"};
     BLERCCar_client car_client{};
 
-    ASSERT_TRUE(car_client.Connect(server));
+    ASSERT_TRUE(car_client.Connect(SERVER_MAC));
 
+    auto expected_drive_mode = DriveMode::Backward;
     int MAX{100};
     for (int i = 0; i < MAX; i += 5)
     {
-        car_client.SetSpeed(DriveMode::Backward, i);
+        car_client.SetSpeed(expected_drive_mode, i);
         std::this_thread::sleep_for(500ms);
     }
+    ASSERT_EQ(car_client.CurrentDriveMode(), expected_drive_mode);
+    std::this_thread::sleep_for(500ms);
 }
 
 // TEST(TestBLERCcar, GetCurrentDrivingMode)
