@@ -49,7 +49,7 @@ car::Car::Car()
     {
         Serial.println("Car is initialized");
         m_LeftDistanceSensor = new environment_sensing::DistanceSensor("Left", 36, 39);
-        // m_RightDistanceSensor = new DistanceSensor();
+        m_RightDistanceSensor = new environment_sensing::DistanceSensor("Right", 34, 35);
         return;
     }
     Serial.println("Failed to initialize");

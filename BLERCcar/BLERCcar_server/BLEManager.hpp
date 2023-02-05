@@ -16,7 +16,9 @@ namespace ble
         MyServerCallbacks *m_pServerCallbacks{NULL};
         MyCharCallbacks *m_pMyCharCallbacks{NULL};
         BLEServer *m_pServer{NULL};
-        BLECharacteristic *m_pFrontLeftDistanceCharacteristic{NULL},
+        BLECharacteristic
+            *m_pFrontRightDistanceCharacteristic{NULL},
+            *m_pFrontLeftDistanceCharacteristic{NULL},
             *m_pReceiveDriveModeCharacteristic{NULL},
             *m_pReceiveSteeringCharacteristic{NULL},
             *m_pCurrentDriveModeCharacteristic{NULL};
@@ -143,11 +145,15 @@ void ble::BLEManager::NotifyNewDriveMode(const BLEDrivePacket &pkt)
 
 void ble::BLEManager::NotifyNewDistanceRead(environment_sensing::DistanceMeasurements &distanceMeasurements)
 {
-    // Serial.println(__PRETTY_FUNCTION__);
-    // Serial.print("Setting FrontLeft value: ");
-    // Serial.println(distanceMeasurements.FrontLeft);
+    Serial.println(__PRETTY_FUNCTION__);
+    Serial.print("Setting FrontLeft value: ");
+    Serial.println(distanceMeasurements.FrontLeft);
     m_pFrontLeftDistanceCharacteristic->setValue(distanceMeasurements.FrontLeft);
     m_pFrontLeftDistanceCharacteristic->notify();
+    Serial.print("Setting FrontRight value: ");
+    Serial.println(distanceMeasurements.FrontRight);
+    m_pFrontRightDistanceCharacteristic->setValue(distanceMeasurements.FrontRight);
+    m_pFrontRightDistanceCharacteristic->notify();
 };
 
 void ble::BLEManager::Advertise()
@@ -185,6 +191,11 @@ ble::BLEManager::BLEManager(Icontroller *controller)
 
     m_pFrontLeftDistanceCharacteristic->addDescriptor(new BLE2902());
 
+    m_pFrontRightDistanceCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_UUID_FRONT_RIGHT_DISTANCE_CM,
+        BLECharacteristic::PROPERTY_NOTIFY);
+    m_pFrontRightDistanceCharacteristic->addDescriptor(new BLE2902());
+
     m_pReceiveDriveModeCharacteristic = pService->createCharacteristic(
         CHARACTERISTIC_UUID_SET_DRIVE_MODES,
         BLECharacteristic::PROPERTY_WRITE);
@@ -209,6 +220,7 @@ ble::BLEManager::~BLEManager()
     delete m_pReceiveDriveModeCharacteristic;
     delete m_pReceiveSteeringCharacteristic;
     delete m_pFrontLeftDistanceCharacteristic;
+    delete m_pFrontRightDistanceCharacteristic;
     delete m_pMyCharCallbacks;
     delete m_pServerCallbacks;
     delete m_pServer;
