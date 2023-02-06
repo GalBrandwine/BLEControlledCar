@@ -9,6 +9,7 @@
 #include <thread>
 #include <unordered_map>
 #include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
 #include "common.hpp"
 #include "Icontroller.hpp"
 #include "BLERCCar_packets.hpp"
@@ -33,6 +34,7 @@ static void print_byte_array(SimpleBluez::ByteArray &bytes)
 class BLERCCar_client : public Icontroller
 {
 private:
+    std::shared_ptr<spdlog::logger> m_ClientLogger;
     SimpleBluez::Bluez m_Bluez;
     const int m_ConnectionAttempts{5};
     std::atomic<bool> m_AsyncThreadActive{true};

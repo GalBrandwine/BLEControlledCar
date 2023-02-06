@@ -9,11 +9,31 @@
 //----------------------------------------------------------------
 const std::string SERVER_MAC{"E0:E2:E6:0C:4A:8A"};
 using namespace std::chrono_literals;
+TEST(TestBLERCcar, SampleSensorsRawData)
+{
+    // Setup
+    BLERCCar_client car_client{};
+    ASSERT_TRUE(car_client.Connect(SERVER_MAC));
+    auto ClientLogger = spdlog::basic_logger_mt("SampleSensorsRawData", "logs/SampleSensorsRawData.csv", true);
+    int MAX{100};
+
+    ClientLogger->info("FrontLeft,FrontRight");
+
+    // Run
+    // Sampling is 10hrz (i.e. 1 new sample every 100 ms) Expecting 2 repeating samples every print
+    for (int i = 0; i < MAX; i += 5)
+    {
+        ClientLogger->info("{},{}", car_client.GetDistanceMeasurements().FrontLeft, car_client.GetDistanceMeasurements().FrontRight);
+        std::this_thread::sleep_for(50ms);
+    }
+
+    // Test
+}
 TEST(TestBLERCcar, ConnectionTestOnly)
 {
     BLERCCar_client car_client{};
     ASSERT_TRUE(car_client.Connect(SERVER_MAC));
-    std::this_thread::sleep_for(500ms);
+    std::this_thread::sleep_for(10000ms);
 }
 
 TEST(TestBLERCcar, MinimalFlow)

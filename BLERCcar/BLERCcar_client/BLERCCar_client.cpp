@@ -2,8 +2,6 @@
 
 BLERCCar_client::BLERCCar_client(/* args */)
 {
-    // Runtime log levels
-    spdlog::set_level(spdlog::level::debug); // Set global log level to info
 
     m_Bluez.init();
     m_Async_thread_arr["BluezKeepAlive"] = new std::thread([&]()
@@ -13,7 +11,9 @@ BLERCCar_client::BLERCCar_client(/* args */)
         std::this_thread::sleep_for(std::chrono::microseconds(100));
         } });
 
-    spdlog::info("Welcome to spdlog version {}.{}.{}  !", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR, SPDLOG_VER_PATCH);
+    m_ClientLogger = spdlog::basic_logger_mt("BLE_RC_Car_Client", "logs/basic-log.txt", true);
+    m_ClientLogger->set_level(spdlog::level::info);
+    m_ClientLogger->info("Welcome to spdlog version {}.{}.{}  !", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR, SPDLOG_VER_PATCH);
 }
 
 BLERCCar_client::~BLERCCar_client()
@@ -37,7 +37,7 @@ bool BLERCCar_client::Connect(const std::string &server)
 {
     int selection{-1};
     auto adapters = m_Bluez.get_adapters();
-    spdlog::info("Available adapters:");
+    m_ClientLogger->info("Available adapters:");
     if (adapters.size() == 1)
     {
         selection = 0;
@@ -50,19 +50,19 @@ bool BLERCCar_client::Connect(const std::string &server)
             ss << "[" << i << "] " << adapters[i]->identifier() << " [" << adapters[i]->address() << "]"
                << std::endl;
         }
-        spdlog::info(ss.str());
-        spdlog::info("Please select an adapter to scan: ");
+        m_ClientLogger->info(ss.str());
+        m_ClientLogger->info("Please select an adapter to scan: ");
         std::cin >> selection;
     }
 
     if (selection < 0 || selection >= adapters.size())
     {
-        spdlog::error("invalid selection");
+        m_ClientLogger->error("invalid selection");
         return false;
     }
 
     auto adapter = adapters[selection];
-    spdlog::info("Scanning {} [{}]", adapter->identifier(), adapter->address());
+    m_ClientLogger->info("Scanning {} [{}]", adapter->identifier(), adapter->address());
 
     SimpleBluez::Adapter::DiscoveryFilter filter;
     filter.Transport = SimpleBluez::Adapter::DiscoveryFilter::TransportType::LE;
@@ -71,7 +71,7 @@ bool BLERCCar_client::Connect(const std::string &server)
     adapter->set_on_device_updated([&](std::shared_ptr<SimpleBluez::Device> device)
                                    {
         if (std::find(m_Peripherals.begin(), m_Peripherals.end(), device) == m_Peripherals.end()) {
-             spdlog::info("Found device: {} [{}]",device->name(),device->address());
+             m_ClientLogger->info("Found device: {} [{}]",device->name(),device->address());
             m_Peripherals.push_back(device);
         } });
 
@@ -79,7 +79,7 @@ bool BLERCCar_client::Connect(const std::string &server)
     millisecond_delay(3000);
     adapter->discovery_stop();
 
-    spdlog::info("The following devices were found:");
+    m_ClientLogger->info("The following devices were found:");
     int server_idx = -1;
     std::stringstream ss;
 
@@ -95,20 +95,20 @@ bool BLERCCar_client::Connect(const std::string &server)
             break;
         }
     }
-    spdlog::info(ss.str());
+    m_ClientLogger->info(ss.str());
 
     if (server_idx < 0)
     {
-        spdlog::error("Could not find device {}", server.c_str());
+        m_ClientLogger->error("Could not find device {}", server.c_str());
         return false;
     }
     else
     {
-        spdlog::info("Find device {}", server.c_str());
+        m_ClientLogger->info("Find device {}", server.c_str());
     }
 
     m_Peripheral = m_Peripherals[server_idx];
-    spdlog::info("Connecting to {} [{}]", m_Peripheral->name(), m_Peripheral->address());
+    m_ClientLogger->info("Connecting to {} [{}]", m_Peripheral->name(), m_Peripheral->address());
 
     for (int attempt = 0; attempt < m_ConnectionAttempts; attempt++)
     {
@@ -119,14 +119,14 @@ bool BLERCCar_client::Connect(const std::string &server)
         }
         catch (SimpleDBus::Exception::SendFailed &e)
         {
-            spdlog::info("Retrying [{}]", m_ConnectionAttempts - attempt);
+            m_ClientLogger->info("Retrying [{}]", m_ConnectionAttempts - attempt);
             millisecond_delay(100);
         }
     }
 
     if (!m_Peripheral->connected() || !m_Peripheral->services_resolved())
     {
-        spdlog::error("Failed to connect to {} [{}]", m_Peripheral->name(), m_Peripheral->address());
+        m_ClientLogger->error("Failed to connect to {} [{}]", m_Peripheral->name(), m_Peripheral->address());
         return false;
     }
     initRssiReadThread();
@@ -144,7 +144,7 @@ void BLERCCar_client::attachNewDriveModeCallback()
                                                          BLEDrivePacket p{driveMode.c_str()};
                                                          m_DriveMode = p.GetDriveMode();
                                                          // memcpy(&m_DistanceMeasurements.FrontLeft, leftSensorReadings.c_str(), sizeof(double));
-                                                         spdlog::debug("New DriveMode received: {}",mode_to_str( p.GetDriveMode())); });
+                                                         m_ClientLogger->debug("New DriveMode received: {}",mode_to_str( p.GetDriveMode())); });
     drive_modes_characteristic->start_notify();
 }
 
@@ -154,9 +154,15 @@ void BLERCCar_client::attachDistanceMeasurementsCallback()
     front_left_distance_reading_characteristic->set_on_value_changed([&](SimpleBluez::ByteArray leftSensorReadings)
                                                                      {
                                                                          memcpy(&m_DistanceMeasurements.FrontLeft, leftSensorReadings.c_str(), sizeof(double));
-                                                                         //  spdlog::debug("leftSensorReadings: {}", m_DistanceMeasurements.FrontLeft);
-                                                                     });
+                                                                          m_ClientLogger->debug("leftSensorReadings,{}", m_DistanceMeasurements.FrontLeft); });
     front_left_distance_reading_characteristic->start_notify();
+
+    auto front_right_distance_reading_characteristic = m_CharMap[CHARACTERISTIC_UUID_FRONT_RIGHT_DISTANCE_CM].second;
+    front_right_distance_reading_characteristic->set_on_value_changed([&](SimpleBluez::ByteArray rightSensorReadings)
+                                                                      {
+                                                                         memcpy(&m_DistanceMeasurements.FrontRight, rightSensorReadings.c_str(), sizeof(double));
+                                                                          m_ClientLogger->debug("rightSensorReadings,{}", m_DistanceMeasurements.FrontRight); });
+    front_right_distance_reading_characteristic->start_notify();
 }
 
 void BLERCCar_client::initRssiReadThread()
@@ -167,13 +173,13 @@ void BLERCCar_client::initRssiReadThread()
         {
             auto rssi = m_Peripheral->rssi();
             m_ConnectionRssi = rssi;
-            spdlog::debug("Connection RSSI: {}", rssi);
+            m_ClientLogger->debug("connectionRSSI,{}", rssi);
             millisecond_delay(500);
         } });
 }
 void BLERCCar_client::disconnect()
 {
-    spdlog::debug("Start {}", __PRETTY_FUNCTION__);
+    m_ClientLogger->debug("Start {}", __PRETTY_FUNCTION__);
     m_Peripheral->disconnect();
 
     millisecond_delay(1000);
@@ -183,13 +189,13 @@ void BLERCCar_client::disconnect()
     {
         while (!async_t.second->joinable())
         {
-            spdlog::info("Disconnecting from {}. Waiting for {} to stop working", m_Peripheral->name(), async_t.first);
+            m_ClientLogger->info("Disconnecting from {}. Waiting for {} to stop working", m_Peripheral->name(), async_t.first);
             millisecond_delay(10);
         }
         async_t.second->join();
         delete async_t.second;
     }
-    spdlog::debug("Finish {}", __PRETTY_FUNCTION__);
+    m_ClientLogger->debug("Finish {}", __PRETTY_FUNCTION__);
 }
 void BLERCCar_client::Disconnect()
 {
@@ -198,35 +204,35 @@ void BLERCCar_client::Disconnect()
 
 void BLERCCar_client::TurnLeft(const char percentage)
 {
-    spdlog::debug("Start {}", __PRETTY_FUNCTION__);
+    m_ClientLogger->debug("Start {}", __PRETTY_FUNCTION__);
     auto steering_characteristic = m_CharMap[CHARACTERISTIC_UUID_STEERING].second;
     BLESteerLeftPacket packet{percentage};
     steering_characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
-    spdlog::debug("Finish {}", __PRETTY_FUNCTION__);
+    m_ClientLogger->debug("Finish {}", __PRETTY_FUNCTION__);
 }
 
 void BLERCCar_client::TurnRight(const char percentage)
 {
-    spdlog::debug("Start {}", __PRETTY_FUNCTION__);
+    m_ClientLogger->debug("Start {}", __PRETTY_FUNCTION__);
     auto steering_characteristic = m_CharMap[CHARACTERISTIC_UUID_STEERING].second;
     BLESteerRightPacket packet{percentage};
     steering_characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
-    spdlog::debug("Finish {}", __PRETTY_FUNCTION__);
+    m_ClientLogger->debug("Finish {}", __PRETTY_FUNCTION__);
 }
 
 void BLERCCar_client::SetDriveMode(DriveMode mode)
 {
-    spdlog::debug("Start {}", __PRETTY_FUNCTION__);
+    m_ClientLogger->debug("Start {}", __PRETTY_FUNCTION__);
     auto characteristic = m_CharMap[CHARACTERISTIC_UUID_SET_DRIVE_MODES].second;
     BLEDrivePacket packet{mode, 0};
     characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
     // auto got = characteristic->read();
-    spdlog::debug("Finish {}", __PRETTY_FUNCTION__);
+    m_ClientLogger->debug("Finish {}", __PRETTY_FUNCTION__);
 }
 
 void BLERCCar_client::SetSpeed(const DriveMode &mode, const char speed)
 {
-    spdlog::debug("Start {}", __PRETTY_FUNCTION__);
+    m_ClientLogger->debug("Start {}", __PRETTY_FUNCTION__);
     auto characteristic = m_CharMap[CHARACTERISTIC_UUID_SET_DRIVE_MODES].second;
 
     // Do we care about Current DriveMode?
@@ -235,5 +241,5 @@ void BLERCCar_client::SetSpeed(const DriveMode &mode, const char speed)
     BLEDrivePacket packet{mode, speed};
     characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
 
-    spdlog::debug("Finish {}", __PRETTY_FUNCTION__);
+    m_ClientLogger->debug("Finish {}", __PRETTY_FUNCTION__);
 }
