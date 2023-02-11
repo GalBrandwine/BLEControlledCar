@@ -23,5 +23,11 @@ target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC # Making this PVIRAT
     ${CMAKE_CURRENT_SOURCE_DIR}/../common
 )
 
+add_executable(${CMAKE_PROJECT_NAME}_main main.cpp)
+target_link_libraries(${CMAKE_PROJECT_NAME}_main ${CMAKE_PROJECT_NAME}_lib)
+
+target_include_directories(${CMAKE_PROJECT_NAME}_main PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/conio.h/
+)
 enable_testing()
 add_subdirectory(test)

@@ -1,54 +1,89 @@
 #include "BLERCCar_client.hpp"
+#include "conio.h"
+
+void print_thread(std::shared_ptr<BLERCCar_client> car_client, const std::string server)
+{
+    while (1)
+    {
+        if (car_client->Connected())
+        {
+            spdlog::info("Car drive mode: {}", car_client->CurrentDriveModeStr());
+            auto measurements = car_client->GetDistanceMeasurements();
+            spdlog::info("FrontLeft {} FrontRight {}", measurements.FrontLeft, measurements.FrontRight);
+        }
+        else
+        {
+            spdlog::info("Car is disconnected, Reconnecting");
+            if (!car_client->Connect(server))
+            {
+                spdlog::error("Couldn't connect to car server on: {}", server);
+                return;
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}
 int main(int argc, char *argv[])
 {
-    auto server{"78:E3:6D:65:45:22"};
-    BLERCCar_client car_client{};
-    if (!car_client.Connect(server))
+    auto server{"E0:E2:E6:0C:4A:8A"};
+    // auto server{"78:E3:6D:65:45:22"};
+    std::shared_ptr<BLERCCar_client> car_client = std::make_shared<BLERCCar_client>(true);
+    if (!car_client->Connect(server))
     {
         spdlog::error("Couldn't connect to car server on: {}", server);
         return 1;
     }
-    car_client.TurnLeft(100);
-    // Store all services and characteristics in a vector.
-    // struct BLEService_characteristics_pair
-    // {
-    //     /* data */
-    // };
 
-    std::cout << "The following services and characteristics were found:" << std::endl;
-    // for (int i = 0; i < char_map.size(); i++)
-    // {
-    //     std::cout << "[" << i << "] " << char_list[i].first->uuid() << " " << char_list[i].second->uuid() << std::endl;
-    // }
+    std::thread t1(print_thread, car_client, server);
 
-    // std::cout << "Please select a characteristic to read: ";
-    // std::cin >> selection;
+    while (1)
+    {
 
-    // if (selection >= 0 && selection < char_list.size())
-    // {
-    //     SimpleBluez::ByteArray value = char_list[selection].second->read();
-    //     std::cout << "Characteristic contents were: ";
-    //     print_byte_array(value);
-    // }
+        if (_kbhit())
+        {
+            auto key_code = _getche();
+            switch (key_code)
+            {
+            case 'a':
+                car_client->TurnLeft(100);
+                break;
+            case 'd':
+                car_client->TurnRight(100);
+                break;
+            case 'w':
+                car_client->SetSpeed(DriveMode::Forward, 0);
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                car_client->SetSpeed(DriveMode::Forward, 80);
+                break;
+            case 's':
+                car_client->SetSpeed(DriveMode::Backward, 0);
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                car_client->SetSpeed(DriveMode::Backward, 80);
+                break;
+            default:
+                break;
+            }
+            spdlog::info(key_code);
+        }
 
-    // auto drive_modes_characteristic = char_map[CHARACTERISTIC_UUID_DRIVE_MODES].second;
-    // drive_modes_characteristic->write_command(SimpleBluez::ByteArray("led on"));
-    // auto characteristic = char_list[2].second;
-    // characteristic->write_command(SimpleBluez::ByteArray("led on"));
+        // do stuff depending on key_code
+        else
+            continue;
+        // while (1)
+        // {
+        //     char input;
+        //     cin >> input;
+        //     switch (input)
+        //     {
+        //     case 'a':
+        //         car_client.TurnLeft(100);
+        //         break;
 
-    // peripheral->disconnect();
-
-    // Sleep for an additional second before returning.
-    // If there are any unexpected events, this example will help debug them.
-    millisecond_delay(1000);
-
-    // async_thread_active = false;
-    // while (!async_thread->joinable())
-    // {
-    //     millisecond_delay(10);
-    // }
-    // async_thread->join();
-    // delete async_thread;
-
-    return 0;
+        //     default:
+        //         break;
+        //     }
+        // }
+        // return 0;
+    }
+    t1.join();
 }

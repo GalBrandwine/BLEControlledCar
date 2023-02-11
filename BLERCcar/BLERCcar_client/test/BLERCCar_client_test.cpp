@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 #include "BLERCCar_client.hpp"
 #include <chrono>
+#include <ctime>
+#include <sstream>
 //----------------------------------------------------------------
 //
 // These are "wet" tests, they require real BLE central.
@@ -14,9 +16,17 @@ TEST(TestBLERCcar, SampleSensorsRawData)
     // Setup
     BLERCCar_client car_client{};
     ASSERT_TRUE(car_client.Connect(SERVER_MAC));
-    auto ClientLogger = spdlog::basic_logger_mt("SampleSensorsRawData", "logs/SampleSensorsRawData.csv", true);
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "logs/%d-%m-%Y %H-%M-%S_SampleSensorsRawData.csv");
+    auto str = oss.str();
+
+    auto ClientLogger = spdlog::basic_logger_mt("SampleSensorsRawData", oss.str(), true);
     int MAX{100};
 
+    // Write Header
     ClientLogger->info("FrontLeft,FrontRight");
 
     // Run
@@ -33,7 +43,7 @@ TEST(TestBLERCcar, ConnectionTestOnly)
 {
     BLERCCar_client car_client{};
     ASSERT_TRUE(car_client.Connect(SERVER_MAC));
-    std::this_thread::sleep_for(10000ms);
+    std::this_thread::sleep_for(1000ms);
 }
 
 TEST(TestBLERCcar, MinimalFlow)
@@ -47,7 +57,6 @@ TEST(TestBLERCcar, MinimalFlow)
 
 TEST(TestBLERCcar, TurnLeftIncrementally)
 {
-    using namespace std::chrono_literals;
     BLERCCar_client car_client{};
 
     ASSERT_TRUE(car_client.Connect(SERVER_MAC));
@@ -62,7 +71,6 @@ TEST(TestBLERCcar, TurnLeftIncrementally)
 
 TEST(TestBLERCcar, TurnRightIncrementally)
 {
-    using namespace std::chrono_literals;
     BLERCCar_client car_client{};
 
     ASSERT_TRUE(car_client.Connect(SERVER_MAC));
@@ -77,7 +85,6 @@ TEST(TestBLERCcar, TurnRightIncrementally)
 
 TEST(TestBLERCcar, SetDriveModeForward)
 {
-    using namespace std::chrono_literals;
     BLERCCar_client car_client{};
 
     ASSERT_TRUE(car_client.Connect(SERVER_MAC));
@@ -91,7 +98,6 @@ TEST(TestBLERCcar, SetDriveModeForward)
 
 TEST(TestBLERCcar, SetSpeedBackwardInclemently)
 {
-    using namespace std::chrono_literals;
     BLERCCar_client car_client{};
 
     ASSERT_TRUE(car_client.Connect(SERVER_MAC));

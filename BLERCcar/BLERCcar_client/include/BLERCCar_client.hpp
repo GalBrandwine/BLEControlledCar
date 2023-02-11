@@ -62,7 +62,7 @@ private:
     void initRssiReadThread();
 
 public:
-    BLERCCar_client(/* args */);
+    BLERCCar_client(bool debug = false);
     ~BLERCCar_client();
     /**
      * @brief Connect to BLERC car server
@@ -72,6 +72,7 @@ public:
      * @return false
      */
     bool Connect(const std::string &server);
+    bool Connected() { return m_Peripheral->connected(); };
     void Disconnect();
 
     void TurnLeft(const char percentage) override;

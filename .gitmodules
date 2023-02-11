@@ -4,3 +4,6 @@
 [submodule "spdlog"]
 	path = spdlog
 	url = git@github.com:gabime/spdlog.git
+[submodule "BLERCcar/BLERCcar_client/lib/conio.h"]
+	path = BLERCcar/BLERCcar_client/lib/conio.h
+	url = git@github.com:zoelabbb/conio.h.git

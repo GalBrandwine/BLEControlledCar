@@ -1,6 +1,6 @@
 #include "BLERCCar_client.hpp"
 
-BLERCCar_client::BLERCCar_client(/* args */)
+BLERCCar_client::BLERCCar_client(bool debug)
 {
 
     m_Bluez.init();
@@ -13,6 +13,8 @@ BLERCCar_client::BLERCCar_client(/* args */)
 
     m_ClientLogger = spdlog::basic_logger_mt("BLE_RC_Car_Client", "logs/basic-log.txt", true);
     m_ClientLogger->set_level(spdlog::level::info);
+    if (debug)
+        m_ClientLogger->set_level(spdlog::level::debug);
     m_ClientLogger->info("Welcome to spdlog version {}.{}.{}  !", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR, SPDLOG_VER_PATCH);
 }
 
