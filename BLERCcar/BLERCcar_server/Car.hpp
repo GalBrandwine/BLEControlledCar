@@ -48,8 +48,8 @@ car::Car::Car()
     if (initMotors())
     {
         Serial.println("Car is initialized");
-        m_LeftDistanceSensor = new environment_sensing::DistanceSensor("Left", 36, 39);
-        m_RightDistanceSensor = new environment_sensing::DistanceSensor("Right", 34, 35);
+        // m_LeftDistanceSensor = new environment_sensing::DistanceSensor("Left", 36, 39);
+        // m_RightDistanceSensor = new environment_sensing::DistanceSensor("Right", 34, 35);
         return;
     }
     Serial.println("Failed to initialize");
@@ -169,6 +169,7 @@ void car::Car::SetDriveMode(DriveMode mode)
             break;
         default:
             m_Mode = DriveMode::Stop;
+            stop(true);
             Serial.print("Called with unsupported mode, setting Stop");
             break;
         }

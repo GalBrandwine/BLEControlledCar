@@ -48,7 +48,7 @@ namespace ble
          */
         void onWrite(BLECharacteristic *pCharacteristic, esp_ble_gatts_cb_param_t *param) override
         {
-            Serial.println("Got onRead callback");
+            Serial.println("Got onWrite callback");
             Serial.println(pCharacteristic->getUUID().toString().c_str());
             if (pCharacteristic->getUUID().toString() == CHARACTERISTIC_UUID_SET_DRIVE_MODES)
             {
@@ -63,15 +63,17 @@ namespace ble
                 if (packet.GetDriveMode() == DriveMode::Unsupported)
                 {
                     Serial.printf("[warn][CHARACTERISTIC_UUID_SET_DRIVE_MODES] onRead callback triggered with UNSUPPORTED DRIVEMODE: %d !!!\n", raw[0]);
+                    m_BLEManager_context.Controller->SetDriveMode(DriveMode::Unsupported);
                     return;
                 }
                 Serial.printf("Got drive mode: %s [raw: %d]\nWith amount: %d\n", mode_to_str(packet.GetDriveMode()).c_str(), raw[0], packet.GetAmount());
 
                 m_BLEManager_context.Controller->SetDriveMode(packet.GetDriveMode());
                 m_BLEManager_context.Controller->SetSpeed(packet.GetAmount());
-                
+
                 Serial.print("Got raw value: ");
                 Serial.println(raw);
+                return;
             }
 
             if (pCharacteristic->getUUID().toString() == CHARACTERISTIC_UUID_STEERING)
@@ -102,6 +104,7 @@ namespace ble
 
                 Serial.print("Got raw value: ");
                 Serial.println(raw);
+                return;
             }
         }
     };

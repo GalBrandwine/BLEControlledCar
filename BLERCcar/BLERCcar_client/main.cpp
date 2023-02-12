@@ -1,9 +1,10 @@
 #include "BLERCCar_client.hpp"
 #include "conio.h"
 
+std::atomic_bool keep_running = true;
 void print_thread(std::shared_ptr<BLERCCar_client> car_client, const std::string server)
 {
-    while (1)
+    while (keep_running)
     {
         if (car_client->Connected())
         {
@@ -22,7 +23,9 @@ void print_thread(std::shared_ptr<BLERCCar_client> car_client, const std::string
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+    spdlog::info("Thread is dead");
 }
+
 int main(int argc, char *argv[])
 {
     auto server{"E0:E2:E6:0C:4A:8A"};
@@ -36,7 +39,7 @@ int main(int argc, char *argv[])
 
     std::thread t1(print_thread, car_client, server);
 
-    while (1)
+    while (keep_running)
     {
 
         if (_kbhit())
@@ -51,15 +54,18 @@ int main(int argc, char *argv[])
                 car_client->TurnRight(100);
                 break;
             case 'w':
-                car_client->SetSpeed(DriveMode::Forward, 0);
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                car_client->TurnLeft(0);
+                std::this_thread::sleep_for(std::chrono::microseconds(50));
                 car_client->SetSpeed(DriveMode::Forward, 80);
                 break;
             case 's':
-                car_client->SetSpeed(DriveMode::Backward, 0);
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 car_client->SetSpeed(DriveMode::Backward, 80);
                 break;
+            case 32: // Space
+                car_client->SetDriveMode(DriveMode::Stop);
+                break;
+            case 'q':
+                keep_running = false;
             default:
                 break;
             }
@@ -85,5 +91,11 @@ int main(int argc, char *argv[])
         // }
         // return 0;
     }
+
     t1.join();
+    while (t1.joinable())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+    
 }

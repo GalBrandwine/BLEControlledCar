@@ -83,6 +83,8 @@ public:
             return DriveMode::Backward;
         case DriveMode::BackwardCollision:
             return DriveMode::BackwardCollision;
+        case DriveMode::Stop:
+            return DriveMode::Stop;
         default:
             return DriveMode::Unsupported;
         }
