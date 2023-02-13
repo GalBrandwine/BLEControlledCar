@@ -2,4 +2,4 @@ out
 build
 BLERCcar/BLERCcar_client/lib/spdlog/
 BLERCcar/BLERCcar_client/lib/SimpleBLE/simplebluez/src/logs/
-BLERCcar/BLERCcar_client/
+BLERCcar/BLERCcar_client/lib/SimpleBLE/simplebluez/src/test/logs/

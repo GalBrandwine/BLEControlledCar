@@ -100,6 +100,8 @@ namespace ble
                     pBLEManager->NotifyNewDistanceRead(distanceMeasurements);
                     vTaskDelay(xDelay);
                 }
+                Serial.println("Controller disconnected");
+                pBLEManager->GetContext().Controller->SetDriveMode(DriveMode::Stop);
             }
             /**
              * @brief Blink while waiting for connection
@@ -136,7 +138,7 @@ namespace ble
 
 void ble::BLEManager::NotifyNewDriveMode(const BLEDrivePacket &pkt)
 {
-    Serial.println(__PRETTY_FUNCTION__);
+    // Serial.println(__PRETTY_FUNCTION__);
     Serial.print("Setting DriveMode value: ");
     Serial.println(mode_to_str(pkt.GetDriveMode()).c_str());
     m_pCurrentDriveModeCharacteristic->setValue(pkt.GetPayload());
@@ -145,13 +147,13 @@ void ble::BLEManager::NotifyNewDriveMode(const BLEDrivePacket &pkt)
 
 void ble::BLEManager::NotifyNewDistanceRead(environment_sensing::DistanceMeasurements &distanceMeasurements)
 {
-    Serial.println(__PRETTY_FUNCTION__);
-    Serial.print("Setting FrontLeft value: ");
-    Serial.println(distanceMeasurements.FrontLeft);
+    Serial.print(__PRETTY_FUNCTION__);
+    Serial.print(" FrontLeft value: ");
+    Serial.print(distanceMeasurements.FrontLeft);
+    Serial.print(" FrontRight value: ");
+    Serial.println(distanceMeasurements.FrontRight);
     m_pFrontLeftDistanceCharacteristic->setValue(distanceMeasurements.FrontLeft);
     m_pFrontLeftDistanceCharacteristic->notify();
-    Serial.print("Setting FrontRight value: ");
-    Serial.println(distanceMeasurements.FrontRight);
     m_pFrontRightDistanceCharacteristic->setValue(distanceMeasurements.FrontRight);
     m_pFrontRightDistanceCharacteristic->notify();
 };

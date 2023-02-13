@@ -8,9 +8,9 @@ void print_thread(std::shared_ptr<BLERCCar_client> car_client, const std::string
     {
         if (car_client->Connected())
         {
-            spdlog::info("Car drive mode: {}", car_client->CurrentDriveModeStr());
             auto measurements = car_client->GetDistanceMeasurements();
-            spdlog::info("FrontLeft {} FrontRight {}", measurements.FrontLeft, measurements.FrontRight);
+            auto rssi = car_client->ConnectionRSSI();
+            spdlog::info("DriveMode={},RSSI={},FrontLeft={}[cm],FrontRight={}[cm]", car_client->CurrentDriveModeStr(), rssi, measurements.FrontLeft, measurements.FrontRight);
         }
         else
         {
@@ -55,7 +55,6 @@ int main(int argc, char *argv[])
                 break;
             case 'w':
                 car_client->TurnLeft(0);
-                std::this_thread::sleep_for(std::chrono::microseconds(50));
                 car_client->SetSpeed(DriveMode::Forward, 80);
                 break;
             case 's':
@@ -97,5 +96,4 @@ int main(int argc, char *argv[])
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
-    
 }

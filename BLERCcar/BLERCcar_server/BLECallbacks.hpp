@@ -48,7 +48,8 @@ namespace ble
          */
         void onWrite(BLECharacteristic *pCharacteristic, esp_ble_gatts_cb_param_t *param) override
         {
-            Serial.println("Got onWrite callback");
+            Serial.println();
+            Serial.print("Got onWrite callback. UUID: ");
             Serial.println(pCharacteristic->getUUID().toString().c_str());
             if (pCharacteristic->getUUID().toString() == CHARACTERISTIC_UUID_SET_DRIVE_MODES)
             {
@@ -66,12 +67,12 @@ namespace ble
                     m_BLEManager_context.Controller->SetDriveMode(DriveMode::Unsupported);
                     return;
                 }
-                Serial.printf("Got drive mode: %s [raw: %d]\nWith amount: %d\n", mode_to_str(packet.GetDriveMode()).c_str(), raw[0], packet.GetAmount());
+                Serial.printf("Got drive mode: %s [raw: %d] amount: %d .\n", mode_to_str(packet.GetDriveMode()).c_str(), raw[0], packet.GetAmount());
 
                 m_BLEManager_context.Controller->SetDriveMode(packet.GetDriveMode());
                 m_BLEManager_context.Controller->SetSpeed(packet.GetAmount());
 
-                Serial.print("Got raw value: ");
+                Serial.print("Raw value is: ");
                 Serial.println(raw);
                 return;
             }
@@ -102,7 +103,7 @@ namespace ble
                     m_BLEManager_context.Controller->TurnRight(packet.GetAmount());
                 }
 
-                Serial.print("Got raw value: ");
+                Serial.print("Raw value is: ");
                 Serial.println(raw);
                 return;
             }

@@ -5,9 +5,9 @@
 class BLERCCarPacket
 {
 protected:
-    const char m_Command;
-    const char m_Amount;
-    const char raw[2];
+    const char m_Command{0};
+    const char m_Amount{0};
+    const char raw[2]{0};
 
 public:
     BLERCCarPacket() = delete;

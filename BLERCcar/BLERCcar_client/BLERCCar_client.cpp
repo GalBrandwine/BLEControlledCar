@@ -11,7 +11,7 @@ BLERCCar_client::BLERCCar_client(bool debug)
         std::this_thread::sleep_for(std::chrono::microseconds(100));
         } });
 
-    m_ClientLogger = spdlog::basic_logger_mt("BLE_RC_Car_Client", "logs/basic-log.txt", true);
+    m_ClientLogger = spdlog::basic_logger_mt("BLE_RC_Car_Client", "test/logs/basic-log.txt", true);
     m_ClientLogger->set_level(spdlog::level::info);
     if (debug)
         m_ClientLogger->set_level(spdlog::level::debug);
@@ -228,7 +228,6 @@ void BLERCCar_client::SetDriveMode(DriveMode mode)
     auto characteristic = m_CharMap[CHARACTERISTIC_UUID_SET_DRIVE_MODES].second;
     BLEDrivePacket packet{mode, 0};
     characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
-    // auto got = characteristic->read();
     m_ClientLogger->debug("Finish {}", __PRETTY_FUNCTION__);
 }
 
@@ -236,12 +235,7 @@ void BLERCCar_client::SetSpeed(const DriveMode &mode, const char speed)
 {
     m_ClientLogger->debug("Start {}", __PRETTY_FUNCTION__);
     auto characteristic = m_CharMap[CHARACTERISTIC_UUID_SET_DRIVE_MODES].second;
-
-    // Do we care about Current DriveMode?
-    // auto got = characteristic->read();
-
     BLEDrivePacket packet{mode, speed};
     characteristic->write_command(SimpleBluez::ByteArray(packet.GetPayload()));
-
     m_ClientLogger->debug("Finish {}", __PRETTY_FUNCTION__);
 }

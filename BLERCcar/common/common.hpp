@@ -67,7 +67,7 @@ const std::string CHARACTERISTIC_UUID_STEERING{"2c6708d2-a1b0-11ed-a8fc-0242ac12
 
 enum DriveMode
 {
-    Forward,
+    Forward = 1,
     ForwardCollision,
     Backward,
     BackwardCollision,

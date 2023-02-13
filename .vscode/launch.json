@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             // /home/gal/dev/BLEControlledCar/BLERCcar/lib/SimpleBLE/examples/simplebluez/build/bin/example_connect
-            "program": "${workspaceRoot}/BLERCcar/lib/SimpleBLE/examples/simplebluez/build/bin/uart_client",
+            "program": "${workspaceRoot}/build/BLERCCar_client_main",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

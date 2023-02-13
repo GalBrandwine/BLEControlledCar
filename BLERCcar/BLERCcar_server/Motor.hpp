@@ -57,8 +57,10 @@ namespace car
     {
         m_Pwmduty = speedPercentageToDutyCycle(speed);
         Serial.println(__PRETTY_FUNCTION__);
-        Serial.printf("Input speed [%d]%%\n", speed);
-        Serial.printf("Setting [%d] pwmduty\n", m_Pwmduty);
+        Serial.printf("Input speed [%d]%%", speed);
+        Serial.println();
+        Serial.printf("Setting [%d] pwmduty", m_Pwmduty);
+        Serial.println();
         ledcWrite(m_PwmChannel, m_Pwmduty);
     }
 

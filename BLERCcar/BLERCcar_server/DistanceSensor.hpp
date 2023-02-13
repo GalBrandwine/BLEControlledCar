@@ -49,7 +49,7 @@ namespace environment_sensing
     const unsigned long DistanceSensor::GetCurrentDistanceInCm()
     {
         Serial.print(m_TaskName.c_str());
-        Serial.println(" sensor getting measurement...");
+        // Serial.println(" sensor getting measurement...");
         // Clears the trigPin
         digitalWrite(m_TrigPin, LOW);
         delayMicroseconds(2);

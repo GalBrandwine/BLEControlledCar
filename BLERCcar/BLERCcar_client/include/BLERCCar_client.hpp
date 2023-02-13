@@ -82,5 +82,15 @@ public:
     void SetDriveMode(DriveMode mode) override;
     const DriveMode CurrentDriveMode() override { return m_DriveMode; };
     const std::string CurrentDriveModeStr() override { return mode_to_str(m_DriveMode); };
+    const int16_t ConnectionRSSI() { return m_ConnectionRssi; };
+    // void AttachDriveModeCallback(std::function<void>)
+
+    /**
+     * @brief Get the Distance Measurements object
+     * @note There's no guarantee that the Distance Measurements will change between function calls.
+     * @note Suggesting to attach user callbacks
+     *
+     * @return const environment_sensing::DistanceMeasurements
+     */
     const environment_sensing::DistanceMeasurements GetDistanceMeasurements() const { return m_DistanceMeasurements; };
 };

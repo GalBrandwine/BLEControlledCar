@@ -48,8 +48,8 @@ car::Car::Car()
     if (initMotors())
     {
         Serial.println("Car is initialized");
-        // m_LeftDistanceSensor = new environment_sensing::DistanceSensor("Left", 36, 39);
-        // m_RightDistanceSensor = new environment_sensing::DistanceSensor("Right", 34, 35);
+        m_LeftDistanceSensor = new environment_sensing::DistanceSensor("Left", 36, 39);
+        m_RightDistanceSensor = new environment_sensing::DistanceSensor("Right", 34, 35);
         return;
     }
     Serial.println("Failed to initialize");
@@ -100,20 +100,22 @@ void car::Car::stop(bool zero_steer = false)
 
 void car::Car::moveForward()
 {
-    Serial.println(__PRETTY_FUNCTION__);
-    Serial.printf("Moving Forward at [%d]%%\n", m_DriveShaft.CurrentSpeedPercentage());
-    Serial.printf("Writing Pin1[%d] = LOW\n", m_DriveShaft.Pin1);
-    Serial.printf("Writing Pin2[%d] = HIGH\n", m_DriveShaft.Pin2);
+    Serial.printf("Moving Forward at [%d]%%. ", m_DriveShaft.CurrentSpeedPercentage());
+    Serial.printf("Writing Pin1[%d] = LOW. ", m_DriveShaft.Pin1);
+    Serial.printf("Writing Pin2[%d] = HIGH.", m_DriveShaft.Pin2);
+    Serial.println();
     digitalWrite(m_DriveShaft.Pin1, LOW);
     digitalWrite(m_DriveShaft.Pin2, HIGH);
 }
 
 void car::Car::moveBackward()
 {
-    Serial.printf("Moving Backward at [%d]%\n", m_DriveShaft.CurrentSpeedPercentage());
+    Serial.printf("Moving Backward at [%d]%%. ", m_DriveShaft.CurrentSpeedPercentage());
+    Serial.printf("Writing Pin1[%d] = HIGH. ", m_DriveShaft.Pin1);
+    Serial.printf("Writing Pin2[%d] = LOW.", m_DriveShaft.Pin2);
+    Serial.println();
     digitalWrite(m_DriveShaft.Pin1, HIGH);
     digitalWrite(m_DriveShaft.Pin2, LOW);
-    delay(2000);
 }
 
 void car::Car::zeroSteer()
@@ -126,11 +128,11 @@ void car::Car::TurnLeft(const char percentage)
 {
     if (percentage == 0)
         zeroSteer();
-    Serial.println(__PRETTY_FUNCTION__);
     m_Steering.SetSpeed(percentage);
-    Serial.printf("TurnLeft [%d]%%\n", m_Steering.CurrentSpeedPercentage());
-    Serial.printf("Writing Pin1[%d] = HIGH\n", m_Steering.Pin1);
-    Serial.printf("Writing Pin2[%d] = LOW\n", m_Steering.Pin2);
+    Serial.printf("TurnLeft [%d]%%. ", m_Steering.CurrentSpeedPercentage());
+    Serial.printf("Writing Pin1[%d] = HIGH. ", m_Steering.Pin1);
+    Serial.printf("Writing Pin2[%d] = LOW. ", m_Steering.Pin2);
+    Serial.println();
     digitalWrite(m_Steering.Pin1, HIGH);
     digitalWrite(m_Steering.Pin2, LOW);
 }
@@ -138,11 +140,11 @@ void car::Car::TurnRight(const char percentage)
 {
     if (percentage == 0)
         zeroSteer();
-    Serial.println(__PRETTY_FUNCTION__);
     m_Steering.SetSpeed(percentage);
-    Serial.printf("TurnRight [%d]%%\n", m_Steering.CurrentSpeedPercentage());
-    Serial.printf("Writing Pin1[%d] = LOW\n", m_Steering.Pin1);
-    Serial.printf("Writing Pin2[%d] = HIGH\n", m_Steering.Pin2);
+    Serial.printf("TurnRight [%d]%%. ", m_Steering.CurrentSpeedPercentage());
+    Serial.printf("Writing Pin1[%d] = LOW. ", m_Steering.Pin1);
+    Serial.printf("Writing Pin2[%d] = HIGH. ", m_Steering.Pin2);
+    Serial.println();
     digitalWrite(m_Steering.Pin1, LOW);
     digitalWrite(m_Steering.Pin2, HIGH);
 }
