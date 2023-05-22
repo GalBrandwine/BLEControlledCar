@@ -39,7 +39,7 @@ private:
     const int m_ConnectionAttempts{5};
     std::atomic<bool> m_AsyncThreadActive{true};
     std::atomic<int16_t> m_ConnectionRssi{-1};
-    std::unordered_map<std::string, std::thread *> m_Async_thread_arr;
+    std::unordered_map<std::string, std::thread *> m_Async_thread_map;
     std::vector<std::shared_ptr<SimpleBluez::Device>> m_Peripherals; // BLE related
     std::unordered_map<std::string, std::pair<std::shared_ptr<SimpleBluez::Service>, std::shared_ptr<SimpleBluez::Characteristic>>>
         m_CharMap;

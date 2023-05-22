@@ -1,4 +1,5 @@
 {
+    "arduino.useArduinoCli": false,
     "files.associations": {
         "*.cpp": "cpp",
         "*.hpp": "cpp",
@@ -90,5 +91,4 @@
         "spdlog"
     ],
     "cmake.sourceDirectory": "${workspaceFolder}/BLERCcar/BLERCcar_client",
-    
 }

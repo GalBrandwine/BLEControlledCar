@@ -48,7 +48,7 @@ namespace environment_sensing
      */
     const unsigned long DistanceSensor::GetCurrentDistanceInCm()
     {
-        Serial.print(m_TaskName.c_str());
+        Serial.println(m_TaskName.c_str());
         // Serial.println(" sensor getting measurement...");
         // Clears the trigPin
         digitalWrite(m_TrigPin, LOW);
@@ -59,7 +59,7 @@ namespace environment_sensing
         delayMicroseconds(10);
         digitalWrite(m_TrigPin, LOW);
         // Reads the echoPin, returns the sound wave travel time in microseconds
-        long duration = pulseIn(m_EchoPin, HIGH);
+        long duration = pulseIn(m_EchoPin, HIGH,300000);// wait 300ms for the pulse to start
         // Calculate the distance
         m_RawDistance = duration * SOUND_SPEED;
         return m_RawDistance / 2.0f;

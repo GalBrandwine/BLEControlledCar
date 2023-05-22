@@ -4,14 +4,14 @@ BLERCCar_client::BLERCCar_client(bool debug)
 {
 
     m_Bluez.init();
-    m_Async_thread_arr["BluezKeepAlive"] = new std::thread([&]()
+    m_Async_thread_map["BluezKeepAlive"] = new std::thread([&]()
                                                            { 
         while (m_AsyncThreadActive){
         m_Bluez.run_async();
         std::this_thread::sleep_for(std::chrono::microseconds(100));
         } });
 
-    m_ClientLogger = spdlog::basic_logger_mt("BLE_RC_Car_Client", "test/logs/basic-log.txt", true);
+    m_ClientLogger = spdlog::basic_logger_mt("BLE_RC_Car_Client", "/home/gal/dev/BLEControlledCar/build/logs/basic-log.txt", true);
     m_ClientLogger->set_level(spdlog::level::info);
     if (debug)
         m_ClientLogger->set_level(spdlog::level::debug);
@@ -169,7 +169,7 @@ void BLERCCar_client::attachDistanceMeasurementsCallback()
 
 void BLERCCar_client::initRssiReadThread()
 {
-    m_Async_thread_arr["ConnectionRssi"] = new std::thread([&]()
+    m_Async_thread_map["ConnectionRssi"] = new std::thread([&]()
                                                            {
         while (m_AsyncThreadActive)
         {
@@ -187,7 +187,7 @@ void BLERCCar_client::disconnect()
     millisecond_delay(1000);
 
     m_AsyncThreadActive = false;
-    for (auto &&async_t : m_Async_thread_arr)
+    for (auto &&async_t : m_Async_thread_map)
     {
         while (!async_t.second->joinable())
         {
