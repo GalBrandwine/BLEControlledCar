@@ -73,7 +73,7 @@ namespace ble
                 // Serial.println(__PRETTY_FUNCTION__);
                 // Serial.printf("Device connected LED: %d\n", led);
                 digitalWrite(led, HIGH); // turn the LED on
-                DriveMode current_drive_mode{DriveMode::Unsupported};
+                DriveMode tmp_drive_mode{DriveMode::InitialConenction};
 
                 /**
                  * @brief Send distance measurements in 10hz
@@ -83,25 +83,27 @@ namespace ble
                 const TickType_t xDelay = 100 / portTICK_PERIOD_MS;
                 while ((pBLEManager->GetContext()).IsDeviceConnected)
                 {
-                    auto tmp_drive_mode = pBLEManager->GetContext().Controller->CurrentDriveMode();
+                    // Send new drive mode back to Client.
+                    auto current_drive_mode = pBLEManager->GetContext().Controller->CurrentDriveMode();
                     if (current_drive_mode != tmp_drive_mode)
                     {
                         Serial.println("current_drive_mode != tmp_drive_mode");
-                        Serial.print("current_drive_mode");
-                        Serial.println(current_drive_mode);
-                        Serial.print("tmp_drive_mode");
-                        Serial.println(tmp_drive_mode);
-                        current_drive_mode = tmp_drive_mode;
+                        Serial.printf("current_drive_mode: %d [%s]\n", current_drive_mode, mode_to_str(current_drive_mode).c_str());
+                        Serial.printf("tmp_drive_mode: %d [%s]\n", current_drive_mode, mode_to_str(tmp_drive_mode).c_str());
+                        tmp_drive_mode = current_drive_mode;
                         BLEDrivePacket p{current_drive_mode, 0};
                         pBLEManager->NotifyNewDriveMode(p);
                     }
 
-                    auto distanceMeasurements = pBLEManager->GetContext().Controller->GetDistanceMeasurements();
-                    pBLEManager->NotifyNewDistanceRead(distanceMeasurements);
+                    // auto distanceMeasurements = pBLEManager->GetContext().Controller->GetDistanceMeasurements();
+                    // pBLEManager->NotifyNewDistanceRead(distanceMeasurements);
+
+                    // Sleep for releasing CPU
                     vTaskDelay(xDelay);
                 }
                 Serial.println("Controller disconnected");
                 pBLEManager->GetContext().Controller->SetDriveMode(DriveMode::Stop);
+                pBLEManager->Advertise();
             }
             /**
              * @brief Blink while waiting for connection
@@ -160,6 +162,7 @@ void ble::BLEManager::NotifyNewDistanceRead(environment_sensing::DistanceMeasure
 
 void ble::BLEManager::Advertise()
 {
+    Serial.println("Asking BLE server to resume advertising");
     m_pServer->startAdvertising();
 };
 

@@ -19,7 +19,7 @@ namespace ble
         MyServerCallbacks(Context &ble_manager_context) : m_BLEManager_context{ble_manager_context} {};
         void onConnect(BLEServer *pServer)
         {
-            Serial.printf("Device %d, had connected\n", pServer->getConnId());
+            Serial.printf("Device %d, had connected.\n ", pServer->getConnId());
             m_BLEManager_context.IsDeviceConnected = true;
         };
 

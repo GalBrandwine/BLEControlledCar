@@ -24,7 +24,7 @@ TEST(TestBLERCcar, SampleSensorsRawData)
     auto str = oss.str();
 
     auto ClientLogger = spdlog::basic_logger_mt("SampleSensorsRawData", oss.str(), true);
-    int MAX{100};
+    int MAX{10000};
 
     // Write Header
     ClientLogger->info("FrontLeft,FrontRight");
@@ -41,7 +41,7 @@ TEST(TestBLERCcar, SampleSensorsRawData)
 }
 TEST(TestBLERCcar, ConnectionTestOnly)
 {
-    BLERCCar_client car_client{};
+    BLERCCar_client car_client{true};
     ASSERT_TRUE(car_client.Connect(SERVER_MAC));
     std::this_thread::sleep_for(1000ms);
 }
@@ -98,7 +98,7 @@ TEST(TestBLERCcar, SetDriveModeForward)
 
 TEST(TestBLERCcar, SetSpeedBackwardInclemently)
 {
-    BLERCCar_client car_client{};
+    BLERCCar_client car_client{true};
 
     ASSERT_TRUE(car_client.Connect(SERVER_MAC));
 
