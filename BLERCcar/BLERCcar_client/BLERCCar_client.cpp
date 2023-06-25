@@ -182,21 +182,23 @@ void BLERCCar_client::initRssiReadThread()
 void BLERCCar_client::disconnect()
 {
     m_ClientLogger->debug("Start {}", __PRETTY_FUNCTION__);
-    m_Peripheral->disconnect();
-
-    millisecond_delay(1000);
-
-    m_AsyncThreadActive = false;
-    for (auto &&async_t : m_Async_thread_map)
+    if (m_Peripheral)
     {
-        while (!async_t.second->joinable())
+        m_Peripheral->disconnect();
+        millisecond_delay(1000);
+        m_AsyncThreadActive = false;
+        for (auto &&async_t : m_Async_thread_map)
         {
-            m_ClientLogger->info("Disconnecting from {}. Waiting for {} to stop working", m_Peripheral->name(), async_t.first);
-            millisecond_delay(10);
+            while (!async_t.second->joinable())
+            {
+                m_ClientLogger->info("Disconnecting from {}. Waiting for {} to stop working", m_Peripheral->name(), async_t.first);
+                millisecond_delay(10);
+            }
+            async_t.second->join();
+            delete async_t.second;
         }
-        async_t.second->join();
-        delete async_t.second;
     }
+
     m_ClientLogger->debug("Finish {}", __PRETTY_FUNCTION__);
 }
 void BLERCCar_client::Disconnect()

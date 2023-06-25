@@ -25,7 +25,6 @@
                 "-fexceptions",
                 "-fno-rtti"
             ],
-            "intelliSenseMode": "gcc-x64",
             "includePath": [
                 "/home/gal/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/sdk/esp32/include/newlib/platform_include",
                 "/home/gal/.arduino15/packages/esp32/hardware/esp32/2.0.5/tools/sdk/esp32/include/freertos/include",
@@ -234,8 +233,9 @@
                 "/home/gal/.arduino15/packages/esp32/hardware/esp32/2.0.5/cores/esp32/Arduino.h",
                 "/usr/include/syscall.h"
             ],
-            "cStandard": "c11",
-            "cppStandard": "c++11",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "gcc-x86",
             "defines": [
                 "HAVE_CONFIG_H",
                 "MBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"",
@@ -579,7 +579,8 @@
                 "__ATOMIC_ACQ_REL=4",
                 "__ATOMIC_RELEASE=3",
                 "USBCON"
-            ]
+            ],
+            "configurationProvider": "ms-vscode.cmake-tools"
         },
         {
             "name": "Cpp",
@@ -595,7 +596,7 @@
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "gnu17",
             "cppStandard": "gnu++17",
-            "intelliSenseMode": "linux-gcc-x64"
+            "intelliSenseMode": "gcc-x86"
         }
     ]
 }
