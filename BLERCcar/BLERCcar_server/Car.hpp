@@ -120,6 +120,7 @@ void car::Car::moveBackward()
 
 void car::Car::zeroSteer()
 {
+    Serial.println("Zeroing steering");
     digitalWrite(m_Steering.Pin1, LOW);
     digitalWrite(m_Steering.Pin2, LOW);
 }
@@ -152,35 +153,33 @@ void car::Car::TurnRight(const char percentage)
 void car::Car::SetDriveMode(DriveMode mode)
 {
     Serial.println(__PRETTY_FUNCTION__);
-    if (mode != m_Mode)
+
+    switch (mode)
     {
-
-        switch (mode)
-        {
-        case Forward:
-            m_Mode = mode;
-            moveForward();
-            break;
-        case Backward:
-            m_Mode = mode;
-            moveBackward();
-            break;
-        case Stop:
-            m_Mode = mode;
-            stop(true);
-            break;
-        default:
-            m_Mode = DriveMode::Stop;
-            stop(true);
-            Serial.print("Called with unsupported mode, setting Stop");
-            break;
-        }
-        Serial.print("Setting DriveMode: ");
-        Serial.println(mode_to_str(m_Mode).c_str());
-        return;
+    case Forward:
+        m_Mode = mode;
+        moveForward();
+        break;
+    case Backward:
+        m_Mode = mode;
+        moveBackward();
+        break;
+    case Stop:
+        m_Mode = mode;
+        break;
+    case DisconnectionStop:
+        m_Mode = mode;
+        stop(true);
+        break;
+    default:
+        m_Mode = DriveMode::Stop;
+        stop(true);
+        Serial.print("Called with unsupported mode, setting Stop");
+        break;
     }
-
-    Serial.printf("Called with mode: %s. But mode is already: %s\n", mode_to_str(mode).c_str(), mode_to_str(m_Mode).c_str());
+    Serial.print("Setting DriveMode: ");
+    Serial.println(mode_to_str(m_Mode).c_str());
+    return;
 };
 
 const environment_sensing::DistanceMeasurements car::Car::GetDistanceMeasurements() const

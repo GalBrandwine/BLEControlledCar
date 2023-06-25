@@ -72,6 +72,7 @@ enum DriveMode
     Backward,
     BackwardCollision,
     Stop,
+    DisconnectionStop,
     Unsupported,
     InitialConenction
 };
@@ -96,6 +97,8 @@ static const std::string mode_to_str(DriveMode mode)
         return "BackwardCollision";
     case Stop:
         return "Stop";
+    case DisconnectionStop:
+        return "DisconnectionStop";
     case InitialConenction:
         return "InitialConenction";
     default:

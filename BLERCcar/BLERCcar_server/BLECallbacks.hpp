@@ -28,7 +28,7 @@ namespace ble
             Serial.printf("Device %d, had disconnected\n", pServer->getConnId());
             Serial.println("Restarting advertising");
             m_BLEManager_context.IsDeviceConnected = false;
-            m_BLEManager_context.Controller->SetDriveMode(DriveMode::Stop);
+            m_BLEManager_context.Controller->SetDriveMode(DriveMode::DisconnectionStop);
         }
     };
     class MyCharCallbacks : public BLECharacteristicCallbacks
