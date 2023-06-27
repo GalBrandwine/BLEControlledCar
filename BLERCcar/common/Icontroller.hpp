@@ -12,7 +12,8 @@ public:
     virtual void SetDriveMode(DriveMode mode) = 0;
     virtual const DriveMode CurrentDriveMode() = 0;
     virtual const std::string CurrentDriveModeStr() = 0;
-    virtual const environment_sensing::DistanceMeasurements GetDistanceMeasurements() const = 0;
+    // virtual const environment_sensing::DistanceMeasurements GetDistanceMeasurements() const = 0;
+    virtual void GetDistanceMeasurements(environment_sensing::DistanceMeasurements &in) const=0;
     virtual ~Icontroller(){};
 };
 

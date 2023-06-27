@@ -14,7 +14,7 @@ using namespace std::chrono_literals;
 TEST(TestBLERCcar, SampleSensorsRawData)
 {
     // Setup
-    BLERCCar_client car_client{};
+    BLERCCar_client car_client{true};
     ASSERT_TRUE(car_client.Connect(SERVER_MAC));
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
@@ -30,10 +30,12 @@ TEST(TestBLERCcar, SampleSensorsRawData)
     ClientLogger->info("FrontLeft,FrontRight");
 
     // Run
+    environment_sensing::DistanceMeasurements measurement;
     // Sampling is 10hrz (i.e. 1 new sample every 100 ms) Expecting 2 repeating samples every print
     for (int i = 0; i < MAX; i += 5)
     {
-        ClientLogger->info("{},{}", car_client.GetDistanceMeasurements().FrontLeft, car_client.GetDistanceMeasurements().FrontRight);
+        car_client.GetDistanceMeasurements(measurement);
+        ClientLogger->info("{},{}", measurement.FrontLeft, measurement.FrontRight);
         std::this_thread::sleep_for(50ms);
     }
 

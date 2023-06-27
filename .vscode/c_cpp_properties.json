@@ -586,7 +586,9 @@
                 "/usr/include/dbus-1.0",
                 "/home/gal/dev/BLEControlledCar/BLERCcar/BLERCcar_client/lib/SimpleBLE/simplebluez/include",
                 "/home/gal/dev/BLEControlledCar/BLERCcar/BLERCcar_client/lib/SimpleBLE/simpledbus/include",
-                "/home/gal/dev/BLEControlledCar/BLERCcar/BLERCcar_client/lib/spdlog/include/spdlog"
+                "/home/gal/dev/BLEControlledCar/BLERCcar/BLERCcar_client/lib/spdlog/include/spdlog",
+                "/usr/include/x86_64-linux-gnu/c++/11",
+                "/usr/include/x86_64-linux-gnu"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

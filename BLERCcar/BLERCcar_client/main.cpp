@@ -4,13 +4,14 @@
 std::atomic_bool keep_running = true;
 void print_thread(std::shared_ptr<BLERCCar_client> car_client, const std::string server)
 {
+    environment_sensing::DistanceMeasurements measurement;
     while (keep_running)
     {
         if (car_client->Connected())
         {
-            auto measurements = car_client->GetDistanceMeasurements();
+            car_client->GetDistanceMeasurements(measurement);
             auto rssi = car_client->ConnectionRSSI();
-            spdlog::info("DriveMode={},RSSI={},FrontLeft={}[cm],FrontRight={}[cm]", car_client->CurrentDriveModeStr(), rssi, measurements.FrontLeft, measurements.FrontRight);
+            spdlog::info("DriveMode={},RSSI={},FrontLeft={}[cm],FrontRight={}[cm]", car_client->CurrentDriveModeStr(), rssi, measurement.FrontLeft, measurement.FrontRight);
         }
         else
         {
@@ -29,7 +30,6 @@ void print_thread(std::shared_ptr<BLERCCar_client> car_client, const std::string
 int main(int argc, char *argv[])
 {
     auto server{"E0:E2:E6:0C:4A:8A"};
-    // auto server{"78:E3:6D:65:45:22"};
     std::shared_ptr<BLERCCar_client> car_client = std::make_shared<BLERCCar_client>(true);
     if (!car_client->Connect(server))
     {

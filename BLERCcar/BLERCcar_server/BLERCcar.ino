@@ -7,6 +7,8 @@ car::Car *my_car;
 ble::BLEManager *ble_mgr;
 bool oldDeviceConnected = false;
 
+// For debug
+environment_sensing::DistanceMeasurements distanceMeasurements;
 void setup()
 {
 
@@ -14,10 +16,16 @@ void setup()
 
   my_car = new car::Car();
   ble_mgr = new ble::BLEManager(my_car);
-
   Serial.println("Waiting a client connection to notify...");
 }
 
 void loop()
 {
+  // ble_mgr->GetContext().Controller->GetDistanceMeasurements(distanceMeasurements);
+  // // Serial.print(__PRETTY_FUNCTION__);
+  // Serial.print(" FrontLeft value: ");
+  // Serial.print(distanceMeasurements.FrontLeft);
+  // Serial.print(" FrontRight value: ");
+  // Serial.println(distanceMeasurements.FrontRight);
+  // sleep(0.5);
 }

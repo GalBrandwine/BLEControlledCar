@@ -86,11 +86,13 @@ public:
     // void AttachDriveModeCallback(std::function<void>)
 
     /**
-     * @brief Get the Distance Measurements object
-     * @note There's no guarantee that the Distance Measurements will change between function calls.
-     * @note Suggesting to attach user callbacks
+     * @brief Get the Distance Measurements
      *
-     * @return const environment_sensing::DistanceMeasurements
+     * @param in &environment_sensing::DistanceMeasurements - to be filled with measurement
      */
-    const environment_sensing::DistanceMeasurements GetDistanceMeasurements() const { return m_DistanceMeasurements; };
+    void GetDistanceMeasurements(environment_sensing::DistanceMeasurements &in) const override
+    {
+        in.FrontLeft = m_DistanceMeasurements.FrontLeft;
+        in.FrontRight = m_DistanceMeasurements.FrontRight;
+    };
 };

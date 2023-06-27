@@ -36,9 +36,9 @@ namespace car
          * @note Unless there will be a User for this measurements on the Server side, than it's implementation is redundant.
          * @note Expected user wil  be BLEManager
          *
-         * @return const environment_sensing::DistanceMeasurements
+         * @param in Reference to environment_sensing::DistanceMeasurements
          */
-        const environment_sensing::DistanceMeasurements GetDistanceMeasurements() const override;
+        void GetDistanceMeasurements(environment_sensing::DistanceMeasurements &in) const override;
     };
 } // Car
 
@@ -182,19 +182,17 @@ void car::Car::SetDriveMode(DriveMode mode)
     return;
 };
 
-const environment_sensing::DistanceMeasurements car::Car::GetDistanceMeasurements() const
+void car::Car::GetDistanceMeasurements(environment_sensing::DistanceMeasurements &in) const
 {
-    environment_sensing::DistanceMeasurements d;
     if (m_LeftDistanceSensor)
     {
         Serial.println("Sampling Left distance sensor");
-        d.FrontLeft = m_LeftDistanceSensor->GetCurrentDistanceInCm();
+        in.FrontLeft = m_LeftDistanceSensor->GetCurrentDistanceInCm();
     }
     if (m_RightDistanceSensor)
     {
         Serial.println("Sampling Right distance sensor");
-        d.FrontRight = m_RightDistanceSensor->GetCurrentDistanceInCm();
+        in.FrontRight = m_RightDistanceSensor->GetCurrentDistanceInCm();
     }
-    return d;
 };
 #endif // CAR
