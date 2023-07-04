@@ -48,8 +48,8 @@ car::Car::Car()
     if (initMotors())
     {
         Serial.println("Car is initialized");
-        m_LeftDistanceSensor = new environment_sensing::DistanceSensor("Left", 36, 39);
-        m_RightDistanceSensor = new environment_sensing::DistanceSensor("Right", 34, 35);
+        m_LeftDistanceSensor = new environment_sensing::DistanceSensor("Left", 26, 25);
+        m_RightDistanceSensor = new environment_sensing::DistanceSensor("Right", 14, 27);
         return;
     }
     Serial.println("Failed to initialize");
