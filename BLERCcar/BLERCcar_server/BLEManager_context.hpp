@@ -6,7 +6,8 @@ namespace ble
     struct Context
     {
         const char LED_PIN = 23;
-        bool IsDeviceConnected{false};
+        unsigned long DisconnectionTime{0};
+        bool DeviceConnected{false};
         Icontroller *Controller;
 
     } // types, *types

@@ -9,7 +9,21 @@
 
 namespace ble
 {
+    auto MAXIMUM_DISCONNECTION_TIMEOUT_MS = 10000;
 
+    // Free func
+    void CoolBlink(char led_pin, int TICKS)
+    {
+        digitalWrite(led_pin, HIGH); // Turn the LED on
+        vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
+        digitalWrite(led_pin, LOW); // Turn the LED off
+        vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
+        digitalWrite(led_pin, HIGH); // Turn the LED on
+        vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
+        digitalWrite(led_pin, LOW); // Turn the LED off
+        vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
+        vTaskDelay(pdMS_TO_TICKS(TICKS * 10));
+    }
     class BLEManager
     {
     private:
@@ -33,12 +47,33 @@ namespace ble
         ~BLEManager();
     };
 
-    void ConnectivityLEDStuff_t(void *pvParameters);
+    /**
+     * @brief Manage disconnection timeout logic
+     *
+     * @param pBLEManager
+     */
+    void manage_disconnection_timeout(ble::BLEManager *pBLEManager)
+    {
+        auto CurrentTime = millis();
+        auto ElapsedTime = CurrentTime - pBLEManager->GetContext().DisconnectionTime;
+        if (ElapsedTime > MAXIMUM_DISCONNECTION_TIMEOUT_MS)
+        {
+            // Serial.print("Time passed since disconnection: ");
+            // Serial.println(ElapsedTime);
+            auto current_drive_mode = pBLEManager->GetContext().Controller->CurrentDriveMode();
+            if (current_drive_mode != DriveMode::DisconnectionStop)
+            {
+                pBLEManager->GetContext().Controller->SetDriveMode(DriveMode::DisconnectionStop);
+            }
+        }
+    }
+
+    void ConnectivityManagementTask_t(void *pvParameters);
     /**
      * @brief Init LED board configuration & start xTask
      *
      */
-    void InitConnectivityLEDStuff(BLEManager *pBLEManager)
+    void InitConnectivityMaintenanceTask(BLEManager *pBLEManager)
     {
         // initialize digital pin LED_BUILTIN as an output.
         auto led = pBLEManager->GetContext().LED_PIN;
@@ -46,12 +81,12 @@ namespace ble
 
         // xTaskCreate should be in SETUP() function - if not the scheduler is not working properly, and there's a xTaskCreate shadowing.
         xTaskCreate(
-            ConnectivityLEDStuff_t, // Function that should be called
-            "ConnectivityLED task", // Name of the task (for debugging)
-            10000,                  // Stack size (bytes)
-            pBLEManager,            // Parameter to pass
-            1,                      // Task priority
-            NULL                    // Task handle
+            ConnectivityManagementTask_t, // Function that should be called
+            "ConnectivityLED task",       // Name of the task (for debugging)
+            10000,                        // Stack size (bytes)
+            pBLEManager,                  // Parameter to pass
+            1,                            // Task priority
+            NULL                          // Task handle
         );
     }
 
@@ -60,7 +95,7 @@ namespace ble
      *
      * @param pvParameters Pointer that will (dangerously) will be casted into BLEManager
      */
-    void ConnectivityLEDStuff_t(void *pvParameters)
+    void ConnectivityManagementTask_t(void *pvParameters)
     {
         int TICKS = 100;
         auto pBLEManager = (BLEManager *)(pvParameters);
@@ -68,20 +103,22 @@ namespace ble
 
         for (;;)
         {
-            if ((pBLEManager->GetContext()).IsDeviceConnected)
+            if ((pBLEManager->GetContext()).DeviceConnected)
             {
                 // Serial.println(__PRETTY_FUNCTION__);
                 // Serial.printf("Device connected LED: %d\n", led);
                 digitalWrite(led, HIGH); // turn the LED on
                 DriveMode tmp_drive_mode{DriveMode::InitialConenction};
 
+                // Create one measurement and update its internal
+                environment_sensing::DistanceMeasurements measurement;
                 /**
                  * @brief Send distance measurements in 10hz
                  *
                  */
                 // Block for 100ms.
                 const TickType_t xDelay = 100 / portTICK_PERIOD_MS;
-                while ((pBLEManager->GetContext()).IsDeviceConnected)
+                while ((pBLEManager->GetContext()).DeviceConnected)
                 {
                     // Send new drive mode back to Client.
                     auto current_drive_mode = pBLEManager->GetContext().Controller->CurrentDriveMode();
@@ -95,14 +132,14 @@ namespace ble
                         pBLEManager->NotifyNewDriveMode(p);
                     }
 
-                    // auto distanceMeasurements = pBLEManager->GetContext().Controller->GetDistanceMeasurements();
-                    // pBLEManager->NotifyNewDistanceRead(distanceMeasurements);
+                    pBLEManager->GetContext().Controller->GetDistanceMeasurements(measurement);
+                    pBLEManager->NotifyNewDistanceRead(measurement);
 
                     // Sleep for releasing CPU
                     vTaskDelay(xDelay);
                 }
                 Serial.println("Controller disconnected");
-                pBLEManager->GetContext().Controller->SetDriveMode(DriveMode::Stop);
+                pBLEManager->GetContext().Controller->SetDriveMode(DriveMode::DisconnectionStop);
                 pBLEManager->Advertise();
             }
             /**
@@ -117,17 +154,11 @@ namespace ble
                  * @brief Blink
                  *
                  */
-                while (!(pBLEManager->GetContext()).IsDeviceConnected)
+                while (!(pBLEManager->GetContext()).DeviceConnected)
                 {
-                    digitalWrite(led, HIGH); // Turn the LED on
-                    vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
-                    digitalWrite(led, LOW); // Turn the LED off
-                    vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
-                    digitalWrite(led, HIGH); // Turn the LED on
-                    vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
-                    digitalWrite(led, LOW); // Turn the LED off
-                    vTaskDelay(pdMS_TO_TICKS(TICKS / 2));
-                    vTaskDelay(pdMS_TO_TICKS(TICKS * 10));
+                    CoolBlink(led, TICKS);
+
+                    manage_disconnection_timeout(pBLEManager);
                 }
             }
             vTaskDelay(pdMS_TO_TICKS(TICKS * 10));
@@ -169,7 +200,7 @@ void ble::BLEManager::Advertise()
 ble::BLEManager::BLEManager(Icontroller *controller)
 {
     m_BLEManager_ctx.Controller = controller;
-    InitConnectivityLEDStuff(this);
+    InitConnectivityMaintenanceTask(this);
 
     // Create the BLE Device
     BLEDevice::init("BLE_RC_Car");

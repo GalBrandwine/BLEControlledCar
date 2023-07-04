@@ -20,14 +20,15 @@ namespace ble
         void onConnect(BLEServer *pServer)
         {
             Serial.printf("Device %d, had connected.\n ", pServer->getConnId());
-            m_BLEManager_context.IsDeviceConnected = true;
+            m_BLEManager_context.DeviceConnected = true;
         };
 
         void onDisconnect(BLEServer *pServer)
         {
             Serial.printf("Device %d, had disconnected\n", pServer->getConnId());
             Serial.println("Restarting advertising");
-            m_BLEManager_context.IsDeviceConnected = false;
+            m_BLEManager_context.DisconnectionTime = millis();
+            m_BLEManager_context.DeviceConnected = false;
             m_BLEManager_context.Controller->SetDriveMode(DriveMode::DisconnectionStop);
         }
     };
@@ -91,7 +92,7 @@ namespace ble
                 {
                     BLESteerLeftPacket packet{raw};
                     Serial.print("Got Steer left command with amount: ");
-                    Serial.println(packet.GetAmount());
+                    Serial.println(packet.GetAmount(),DEC);
                     m_BLEManager_context.Controller->TurnLeft(packet.GetAmount());
                 }
 
@@ -99,7 +100,7 @@ namespace ble
                 {
                     BLESteerRightPacket packet{raw};
                     Serial.print("Got Steer right command with amount: ");
-                    Serial.println(packet.GetAmount());
+                    Serial.println(packet.GetAmount(),DEC);
                     m_BLEManager_context.Controller->TurnRight(packet.GetAmount());
                 }
 
