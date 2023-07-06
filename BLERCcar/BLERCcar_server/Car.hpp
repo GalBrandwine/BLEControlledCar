@@ -166,6 +166,7 @@ void car::Car::SetDriveMode(DriveMode mode)
         break;
     case Stop:
         m_Mode = mode;
+        stop();
         break;
     case DisconnectionStop:
         m_Mode = mode;
